@@ -48,30 +48,29 @@ export class Game extends GameCore implements IGame {
       mouse: this.mouse,
     });
     this.hero.init();
-    this.boss.init();
+    this.boss.init(this.hero);
 
     this.objects.push(this.boss);
   }
 
   drawCursor = () => {
-    // this.objects.forEach((obj) => {
-    //   if (
-    //     this.mouse.x > obj.coord.x - obj.radius &&
-    //     this.mouse.x < obj.coord.x + obj.radius &&
-    //     this.mouse.y > obj.coord.y - obj.radius &&
-    //     this.mouse.y < obj.coord.y + obj.radius
-    //   ) {
-    //     this.canvas.style.cursor = "crosshair";
-    //   } else {
-    //     this.canvas.style.cursor = "auto";
-    //   }
-    // });
-    this.canvas.style.cursor = "crosshair";
+    this.objects.forEach((obj) => {
+      if (
+        this.mouse.x > obj.coord.x - obj.radius &&
+        this.mouse.x < obj.coord.x + obj.radius &&
+        this.mouse.y > obj.coord.y - obj.radius &&
+        this.mouse.y < obj.coord.y + obj.radius
+      ) {
+        this.canvas.style.cursor = "crosshair";
+      } else {
+        this.canvas.style.cursor = "auto";
+      }
+    });
   };
 
   draw = () => {
     this.drawCursor();
     this.hero.draw(this.objects);
-    this.boss.draw();
+    this.boss.draw(this.hero);
   };
 }

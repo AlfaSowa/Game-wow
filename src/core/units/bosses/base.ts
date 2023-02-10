@@ -4,6 +4,7 @@ import {
   createStrokeCircle,
 } from "../../engine/engine";
 import { CoreBase } from "../../interfaces";
+import { VoidZone } from "../../spells/void-zone";
 
 export class BaseBossClass extends CoreBase {
   coord = { x: window.innerWidth / 2, y: 130 };
@@ -13,14 +14,64 @@ export class BaseBossClass extends CoreBase {
   curHp = this.maxHp;
   speed = 1;
 
+  voidZoneCount = 2000;
+  voidZoneCountShow = 300;
+  voides: any[] = [];
+
   maxShield = 300;
   shield = this.maxShield;
   shieldRadius = this.radius + 20;
   shieldColor = "#0d9ad0";
 
-  init() {}
+  createvoidZone = (target: any, positive: boolean = false) => {
+    this.voides.push(
+      new VoidZone({
+        coord: target.coord,
+        coreOptions: {
+          canvas: this.canvas,
+          ctx: this.ctx,
+          mouse: this.mouse,
+        },
+        positive,
+      })
+    );
+    // if (this.voidZoneCount < this.voidZoneCountShow) {
+    //   createCurrentValue(
+    //     this.ctx,
+    //     target.coord.x,
+    //     target.coord.y,
+    //     target.radius + 10,
+    //     this.voidZoneCountShow,
+    //     this.voidZoneCount,
+    //     "#9c50ff",
+    //     4
+    //   );
+    // }
 
-  draw() {
+    // if (this.voidZoneCount <= 0) {
+    //   this.voides.push(
+    //     new VoidZone({
+    //       coord: target.coord,
+    //       coreOptions: {
+    //         canvas: this.canvas,
+    //         ctx: this.ctx,
+    //         mouse: this.mouse,
+    //       },
+    //     })
+    //   );
+    // } else {
+    //   this.voidZoneCount -= 1;
+    // }
+  };
+
+  init(target: any) {
+    this.createvoidZone(target);
+    setTimeout(() => {
+      this.createvoidZone(target, true);
+    }, 5000);
+  }
+
+  draw(target: any) {
     createFillCircle(
       this.ctx,
       this.coord.x,
@@ -66,5 +117,7 @@ export class BaseBossClass extends CoreBase {
         4
       );
     }
+
+    this.voides.map((voidZone) => voidZone.draw(this, target));
   }
 }

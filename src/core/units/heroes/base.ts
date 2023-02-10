@@ -1,4 +1,8 @@
-import { createFillCircle } from "../../engine/engine";
+import {
+  createCurrentValue,
+  createFillCircle,
+  createStrokeCircle,
+} from "../../engine/engine";
 import { isOnField } from "../../engine/utils";
 import { CoreBase } from "../../interfaces";
 import { RangeAttack } from "../core/rangeAttack";
@@ -74,6 +78,24 @@ class BaseHeroClass extends CoreBase {
       this.radius,
       this.color
     );
+    createStrokeCircle(
+      this.ctx,
+      this.coord.x,
+      this.coord.y,
+      this.radius,
+      "rgba(255,255,255,0.1)",
+      7
+    );
+    createCurrentValue(
+      this.ctx,
+      this.coord.x,
+      this.coord.y,
+      this.radius,
+      this.maxHp,
+      this.curHp,
+      "#F12",
+      7
+    );
   }
 }
 
@@ -113,7 +135,9 @@ export class BaseHeroClassWithRangeAttack extends BaseHeroClass {
 
   draw = (objects: any[] = []) => {
     super.draw();
-    this.drawStuff();
-    this.drawAttack(objects);
+    if (this.curHp > 0) {
+      this.drawStuff();
+      this.drawAttack(objects);
+    }
   };
 }

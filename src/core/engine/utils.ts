@@ -10,3 +10,16 @@ export const isOnField = (x: number, y: number, radius: number): boolean => {
     y <= window.innerHeight - radius
   );
 };
+
+export const isTargetsColision = (targetA: any, targetB: any): boolean => {
+  let delta = {
+    x: targetA.coord.x - targetB.coord.x,
+    y: targetA.coord.y - targetB.coord.y,
+  };
+  let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+
+  if (dist < targetA.radius + targetB.radius) {
+    return true;
+  }
+  return false;
+};
