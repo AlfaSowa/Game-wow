@@ -1,19 +1,22 @@
 import { GameCore, CoreOptionsWithoutCoord, MouseType } from "../interfaces";
+import { BaseBossClass } from "../units/bosses/base";
 import { BaseHeroClassWithRangeAttack } from "../units/heroes/base";
 
 interface IGame {
   hero: any;
+  boss: any;
   mouse: MouseType;
   width: number;
   height: number;
 }
 
 export class Game extends GameCore implements IGame {
-  hero: any;
-  objects = [];
+  objects: any[] = [];
   height: number;
   width: number;
   mouse: MouseType;
+  hero: any;
+  boss: any;
 
   constructor({ canvas, ctx }: CoreOptionsWithoutCoord) {
     super({ canvas, ctx });
@@ -33,12 +36,21 @@ export class Game extends GameCore implements IGame {
 
   init() {
     this.canvas.addEventListener("mousemove", this.setPos);
+
     this.hero = new BaseHeroClassWithRangeAttack({
       canvas: this.canvas,
       ctx: this.ctx,
       mouse: this.mouse,
     });
+    this.boss = new BaseBossClass({
+      canvas: this.canvas,
+      ctx: this.ctx,
+      mouse: this.mouse,
+    });
     this.hero.init();
+    this.boss.init();
+
+    this.objects.push(this.boss);
   }
 
   drawCursor = () => {
@@ -59,6 +71,7 @@ export class Game extends GameCore implements IGame {
 
   draw = () => {
     this.drawCursor();
-    this.hero.draw();
+    this.hero.draw(this.objects);
+    this.boss.draw();
   };
 }

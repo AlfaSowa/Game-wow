@@ -59,4 +59,5 @@ const useCanvas = (drawGame: any): ReturnUseCanvas => {
     canvasRef: canvasRef,
   };
 };
+
 export default useCanvas;

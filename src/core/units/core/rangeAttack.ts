@@ -13,7 +13,7 @@ export class RangeAttack extends CoreBase {
 
   bubble = false;
   bubbleRadius = randomNumber(1, 5);
-  bubbleLive = 1;
+  bubbleLive = 2;
   bubbleFading = randomNumber(0.1, 0.02);
 
   constructor(
@@ -102,7 +102,7 @@ export class RangeAttack extends CoreBase {
     });
   };
 
-  draw = () => {
+  draw = (objects: any[], heroDamage: number) => {
     if (!this.bubble) {
       createFillCircle(
         this.ctx,
@@ -112,7 +112,7 @@ export class RangeAttack extends CoreBase {
         this.color
       );
       this.moveBullet();
-      // this.collisionWithObject(objects, heroDamage);
+      this.collisionWithObject(objects, heroDamage);
     } else {
       this.createBubble();
     }
