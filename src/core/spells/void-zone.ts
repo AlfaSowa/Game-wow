@@ -9,51 +9,108 @@ export class VoidZone extends CoreBase {
   finish: boolean = false;
   coord: CoordsType;
   positive: boolean;
+  isSucking: boolean;
+  curRadius: number;
+  vel: number = 1;
 
   constructor({
     coord,
     coreOptions,
     positive,
+    isSucking,
   }: {
     coord: CoordsType;
     coreOptions: CoreOptions;
     positive: boolean;
+    isSucking: boolean;
   }) {
     super(coreOptions);
     this.coord = { x: coord.x, y: coord.y };
     this.positive = positive;
     this.color = positive ? "#008a1c80" : "#5400c380";
+    this.isSucking = isSucking;
+    this.curRadius = positive ? this.maxRadius : this.radius;
   }
 
-  grow = () => {
-    this.radius += 0.1;
+  change = () => {
+    this.curRadius += 0.1;
   };
 
-  createZone = (target: any) => {
-    if (this.radius < this.maxRadius) {
-      this.grow();
+  move = (target: any) => {
+    if (this.coord.x !== target.coord.x || this.coord.y !== target.coord.y) {
+      let delta = {
+        x: target.coord.x - this.coord.x,
+        y: target.coord.y - this.coord.y,
+      };
+      let angle = Math.atan2(delta.y, delta.x);
+
+      if (
+        this.coord.x > 0 &&
+        this.coord.x < window.innerWidth &&
+        this.coord.y > 0 &&
+        this.coord.y < window.innerHeight
+      ) {
+        this.coord.x += Math.cos(angle) * this.vel;
+        this.coord.y += Math.sin(angle) * this.vel;
+        // target.coord.x += Math.cos(angle) * this.vel;
+        // target.coord.y += Math.sin(angle) * this.vel;
+      } else {
+        this.finish = true;
+      }
+    }
+  };
+
+  createZone = (targetA: any, targetB: any) => {
+    if (!this.positive && this.curRadius < this.maxRadius) {
+      this.change();
     }
 
     createFillCircle(
       this.ctx,
       this.coord.x,
       this.coord.y,
-      this.radius,
+      this.curRadius,
       this.color
     );
 
-    if (isTargetsColision(target, this)) {
+    if (isTargetsColision(targetB, this)) {
       if (this.positive) {
-        if (target.curHp < target.maxHp) {
-          target.curHp += 1;
+        if (targetB.curHp < targetB.maxHp) {
+          targetB.curHp += 1;
+        }
+        if (this.curRadius >= this.radius) {
+          this.curRadius -= 0.1;
+        } else {
+          this.finish = true;
         }
       } else {
-        target.curHp -= 1;
+        targetB.curHp -= 1;
+      }
+    }
+
+    if (isTargetsColision(targetA, this)) {
+      if (this.positive) {
+        if (
+          targetA.curHp <= targetB.maxHp ||
+          targetA.shield <= targetA.maxShield
+        ) {
+          if (targetA.shield > 0) {
+            targetA.shield += 0.1;
+          } else {
+            targetA.curHp += 0.1;
+          }
+        }
+
+        if (this.curRadius >= this.radius) {
+          this.curRadius -= 0.1;
+        } else {
+          this.finish = true;
+        }
       }
     }
   };
 
   draw = (targetA: any, targetB: any) => {
-    this.createZone(targetB);
+    this.createZone(targetA, targetB);
   };
 }

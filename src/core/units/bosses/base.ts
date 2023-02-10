@@ -17,24 +17,45 @@ export class BaseBossClass extends CoreBase {
   voidZoneCount = 2000;
   voidZoneCountShow = 300;
   voides: any[] = [];
+  healVoides: any[] = [];
 
   maxShield = 300;
   shield = this.maxShield;
   shieldRadius = this.radius + 20;
   shieldColor = "#0d9ad0";
 
-  createvoidZone = (target: any, positive: boolean = false) => {
-    this.voides.push(
-      new VoidZone({
-        coord: target.coord,
-        coreOptions: {
-          canvas: this.canvas,
-          ctx: this.ctx,
-          mouse: this.mouse,
-        },
-        positive,
-      })
-    );
+  createvoidZone = (
+    target: any,
+    positive: boolean = false,
+    isSucking: boolean = false
+  ) => {
+    if (positive) {
+      this.healVoides.push(
+        new VoidZone({
+          coord: target.coord,
+          coreOptions: {
+            canvas: this.canvas,
+            ctx: this.ctx,
+            mouse: this.mouse,
+          },
+          positive,
+          isSucking,
+        })
+      );
+    } else {
+      this.voides.push(
+        new VoidZone({
+          coord: target.coord,
+          coreOptions: {
+            canvas: this.canvas,
+            ctx: this.ctx,
+            mouse: this.mouse,
+          },
+          positive,
+          isSucking,
+        })
+      );
+    }
     // if (this.voidZoneCount < this.voidZoneCountShow) {
     //   createCurrentValue(
     //     this.ctx,
@@ -67,8 +88,8 @@ export class BaseBossClass extends CoreBase {
   init(target: any) {
     this.createvoidZone(target);
     setTimeout(() => {
-      this.createvoidZone(target, true);
-    }, 5000);
+      this.createvoidZone(target, true, true);
+    }, 3000);
   }
 
   draw(target: any) {
@@ -118,6 +139,23 @@ export class BaseBossClass extends CoreBase {
       );
     }
 
-    this.voides.map((voidZone) => voidZone.draw(this, target));
+    this.voides.forEach((voidZone) => {
+      voidZone.draw(this, target);
+
+      if (voidZone.finish) {
+        this.voides = this.voides.filter((item) => !item.finish);
+      }
+    });
+
+    this.healVoides.forEach((voidZone) => {
+      voidZone.draw(this, target);
+
+      if (this.shield <= this.maxShield / 2) {
+        voidZone.move(this);
+      }
+      if (voidZone.finish) {
+        this.healVoides = this.healVoides.filter((item) => !item.finish);
+      }
+    });
   }
 }

@@ -18,7 +18,7 @@ export const isTargetsColision = (targetA: any, targetB: any): boolean => {
   };
   let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
 
-  if (dist < targetA.radius + targetB.radius) {
+  if (dist < targetA.radius + targetB.curRadius) {
     return true;
   }
   return false;
