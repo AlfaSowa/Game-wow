@@ -3,7 +3,7 @@ import {
   createFillCircle,
   createStrokeCircle,
 } from "../../engine/engine";
-import { isOnField } from "../../engine/utils";
+import { isOnCanavasField } from "../../engine/utils";
 import { CoreBase } from "../../interfaces";
 import { RangeAttack } from "../core/rangeAttack";
 
@@ -12,7 +12,7 @@ type MovesKeys = "KeyW" | "KeyA" | "KeyS" | "KeyD";
 class BaseHeroClass extends CoreBase {
   target = { x: window.innerWidth / 2, y: window.innerHeight - 200 };
   coord = { x: window.innerWidth / 2, y: window.innerHeight - 200 };
-  heroDamage = 5;
+  heroDamage = 2;
   maxHp = 400;
   curHp = this.maxHp;
   vel = 3;
@@ -30,7 +30,7 @@ class BaseHeroClass extends CoreBase {
   };
 
   drawStuff = () => {
-    if (isOnField(this.coord.x, this.coord.y, this.radius)) {
+    if (isOnCanavasField(this.coord.x, this.coord.y, this.radius)) {
       if (this.KeyD) {
         this.coord.x += this.vel;
       }
@@ -118,9 +118,9 @@ export class BaseHeroClassWithRangeAttack extends BaseHeroClass {
     );
   };
 
-  drawAttack = (objects: any[]) => {
+  drawAttack = (targets: any[]) => {
     this.attaks.forEach((attack) => {
-      attack.draw(objects, this.heroDamage);
+      attack.draw(targets, this.heroDamage);
 
       if (attack.finish) {
         this.attaks = this.attaks.filter((item) => !item.finish);
@@ -133,11 +133,11 @@ export class BaseHeroClassWithRangeAttack extends BaseHeroClass {
     window.addEventListener("mousedown", this.baseAttack);
   }
 
-  draw = (objects: any[] = []) => {
+  draw = (targets: any[] = []) => {
     super.draw();
     if (this.curHp > 0) {
       this.drawStuff();
-      this.drawAttack(objects);
+      this.drawAttack(targets);
     }
   };
 }

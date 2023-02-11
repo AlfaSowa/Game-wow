@@ -1,5 +1,6 @@
+import { isMouseOnTarget } from "../engine/utils";
 import { GameCore, CoreOptionsWithoutCoord, MouseType } from "../interfaces";
-import { BaseBossClass } from "../units/bosses/base";
+import { FireBoss } from "../units/bosses/fire-boss";
 import { BaseHeroClassWithRangeAttack } from "../units/heroes/base";
 
 interface IGame {
@@ -11,7 +12,7 @@ interface IGame {
 }
 
 export class Game extends GameCore implements IGame {
-  objects: any[] = [];
+  heroTargets: any[] = [];
   height: number;
   width: number;
   mouse: MouseType;
@@ -42,7 +43,7 @@ export class Game extends GameCore implements IGame {
       ctx: this.ctx,
       mouse: this.mouse,
     });
-    this.boss = new BaseBossClass({
+    this.boss = new FireBoss({
       canvas: this.canvas,
       ctx: this.ctx,
       mouse: this.mouse,
@@ -50,17 +51,12 @@ export class Game extends GameCore implements IGame {
     this.hero.init();
     this.boss.init(this.hero);
 
-    this.objects.push(this.boss);
+    this.heroTargets.push(this.boss);
   }
 
   drawCursor = () => {
-    this.objects.forEach((obj) => {
-      if (
-        this.mouse.x > obj.coord.x - obj.radius &&
-        this.mouse.x < obj.coord.x + obj.radius &&
-        this.mouse.y > obj.coord.y - obj.radius &&
-        this.mouse.y < obj.coord.y + obj.radius
-      ) {
+    this.heroTargets.forEach((target) => {
+      if (isMouseOnTarget(this.mouse, target)) {
         this.canvas.style.cursor = "crosshair";
       } else {
         this.canvas.style.cursor = "auto";
@@ -70,7 +66,7 @@ export class Game extends GameCore implements IGame {
 
   draw = () => {
     this.drawCursor();
-    this.hero.draw(this.objects);
+    this.hero.draw(this.heroTargets);
     this.boss.draw(this.hero);
   };
 }

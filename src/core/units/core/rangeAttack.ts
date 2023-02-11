@@ -1,5 +1,5 @@
 import { createFillCircle } from "../../engine/engine";
-import { randomNumber } from "../../engine/utils";
+import { isTargetsColision, randomNumber } from "../../engine/utils";
 import { CoordsType, CoreBase, CoreOptions, MouseType } from "../../interfaces";
 
 export class RangeAttack extends CoreBase {
@@ -79,30 +79,24 @@ export class RangeAttack extends CoreBase {
     }
   };
 
-  collisionWithObject = (objects: any[], heroDamage: number) => {
-    objects.forEach((object) => {
-      let delta = {
-        x: object.coord.x - this.coord.x,
-        y: object.coord.y - this.coord.y,
-      };
-      let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
-
-      if (object.shield) {
-        if (dist <= object.shieldRadius + this.radius) {
+  collisionWithObject = (targets: any[], damage: number) => {
+    targets.forEach((target) => {
+      if (target.shield) {
+        if (isTargetsColision(target, this)) {
           this.bubble = true;
-          this.objectDamageCoord = { x: object.coord.x, y: object.coord.y };
-          object.shield -= heroDamage;
+          this.objectDamageCoord = { x: target.coord.x, y: target.coord.y };
+          target.shield -= damage;
         }
       } else {
-        if (dist < object.radius + this.radius) {
+        if (isTargetsColision(target, this)) {
           this.finish = true;
-          object.curHp -= heroDamage;
+          target.curHp -= damage;
         }
       }
     });
   };
 
-  draw = (objects: any[], heroDamage: number) => {
+  draw = (targets: any[], damage: number) => {
     if (!this.bubble) {
       createFillCircle(
         this.ctx,
@@ -112,7 +106,7 @@ export class RangeAttack extends CoreBase {
         this.color
       );
       this.moveBullet();
-      this.collisionWithObject(objects, heroDamage);
+      this.collisionWithObject(targets, damage);
     } else {
       this.createBubble();
     }

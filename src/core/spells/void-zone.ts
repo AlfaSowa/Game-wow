@@ -12,17 +12,20 @@ export class VoidZone extends CoreBase {
   isSucking: boolean;
   curRadius: number;
   vel: number = 1;
+  moveTo: boolean;
 
   constructor({
     coord,
     coreOptions,
     positive,
     isSucking,
+    moveTo,
   }: {
     coord: CoordsType;
     coreOptions: CoreOptions;
     positive: boolean;
     isSucking: boolean;
+    moveTo: boolean;
   }) {
     super(coreOptions);
     this.coord = { x: coord.x, y: coord.y };
@@ -30,17 +33,22 @@ export class VoidZone extends CoreBase {
     this.color = positive ? "#008a1c80" : "#5400c380";
     this.isSucking = isSucking;
     this.curRadius = positive ? this.maxRadius : this.radius;
+    this.moveTo = moveTo;
   }
 
   change = () => {
     this.curRadius += 0.1;
   };
 
-  move = (target: any) => {
-    if (this.coord.x !== target.coord.x || this.coord.y !== target.coord.y) {
+  isMove = (value: boolean) => {
+    this.moveTo = value;
+  };
+
+  moveToCreator = (creator: any) => {
+    if (this.coord.x !== creator.coord.x || this.coord.y !== creator.coord.y) {
       let delta = {
-        x: target.coord.x - this.coord.x,
-        y: target.coord.y - this.coord.y,
+        x: creator.coord.x - this.coord.x,
+        y: creator.coord.y - this.coord.y,
       };
       let angle = Math.atan2(delta.y, delta.x);
 
@@ -52,15 +60,15 @@ export class VoidZone extends CoreBase {
       ) {
         this.coord.x += Math.cos(angle) * this.vel;
         this.coord.y += Math.sin(angle) * this.vel;
-        // target.coord.x += Math.cos(angle) * this.vel;
-        // target.coord.y += Math.sin(angle) * this.vel;
+        // creator.coord.x += Math.cos(angle) * this.vel;
+        // creator.coord.y += Math.sin(angle) * this.vel;
       } else {
         this.finish = true;
       }
     }
   };
 
-  createZone = (targetA: any, targetB: any) => {
+  createZone = (creator: any, target: any) => {
     if (!this.positive && this.curRadius < this.maxRadius) {
       this.change();
     }
@@ -73,36 +81,36 @@ export class VoidZone extends CoreBase {
       this.color
     );
 
-    if (isTargetsColision(targetB, this)) {
+    if (isTargetsColision(target, this)) {
       if (this.positive) {
-        if (targetB.curHp < targetB.maxHp) {
-          targetB.curHp += 1;
+        if (target.curHp < target.maxHp) {
+          target.curHp += 1;
         }
         if (this.curRadius >= this.radius) {
-          this.curRadius -= 0.1;
+          this.curRadius -= 0.3;
         } else {
           this.finish = true;
         }
       } else {
-        targetB.curHp -= 1;
+        target.curHp -= 1;
       }
     }
 
-    if (isTargetsColision(targetA, this)) {
+    if (isTargetsColision(creator, this)) {
       if (this.positive) {
         if (
-          targetA.curHp <= targetB.maxHp ||
-          targetA.shield <= targetA.maxShield
+          creator.curHp <= creator.maxHp ||
+          creator.shield <= creator.maxShield
         ) {
-          if (targetA.shield > 0) {
-            targetA.shield += 0.1;
+          if (creator.shield > 0) {
+            creator.shield += 0.1;
           } else {
-            targetA.curHp += 0.1;
+            creator.curHp += 0.1;
           }
         }
 
         if (this.curRadius >= this.radius) {
-          this.curRadius -= 0.1;
+          this.curRadius -= 1;
         } else {
           this.finish = true;
         }
@@ -110,7 +118,7 @@ export class VoidZone extends CoreBase {
     }
   };
 
-  draw = (targetA: any, targetB: any) => {
-    this.createZone(targetA, targetB);
+  draw = (creator: any, target: any) => {
+    this.createZone(creator, target);
   };
 }

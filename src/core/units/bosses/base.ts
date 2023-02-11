@@ -4,7 +4,6 @@ import {
   createStrokeCircle,
 } from "../../engine/engine";
 import { CoreBase } from "../../interfaces";
-import { VoidZone } from "../../spells/void-zone";
 
 export class BaseBossClass extends CoreBase {
   coord = { x: window.innerWidth / 2, y: 130 };
@@ -24,73 +23,7 @@ export class BaseBossClass extends CoreBase {
   shieldRadius = this.radius + 20;
   shieldColor = "#0d9ad0";
 
-  createvoidZone = (
-    target: any,
-    positive: boolean = false,
-    isSucking: boolean = false
-  ) => {
-    if (positive) {
-      this.healVoides.push(
-        new VoidZone({
-          coord: target.coord,
-          coreOptions: {
-            canvas: this.canvas,
-            ctx: this.ctx,
-            mouse: this.mouse,
-          },
-          positive,
-          isSucking,
-        })
-      );
-    } else {
-      this.voides.push(
-        new VoidZone({
-          coord: target.coord,
-          coreOptions: {
-            canvas: this.canvas,
-            ctx: this.ctx,
-            mouse: this.mouse,
-          },
-          positive,
-          isSucking,
-        })
-      );
-    }
-    // if (this.voidZoneCount < this.voidZoneCountShow) {
-    //   createCurrentValue(
-    //     this.ctx,
-    //     target.coord.x,
-    //     target.coord.y,
-    //     target.radius + 10,
-    //     this.voidZoneCountShow,
-    //     this.voidZoneCount,
-    //     "#9c50ff",
-    //     4
-    //   );
-    // }
-
-    // if (this.voidZoneCount <= 0) {
-    //   this.voides.push(
-    //     new VoidZone({
-    //       coord: target.coord,
-    //       coreOptions: {
-    //         canvas: this.canvas,
-    //         ctx: this.ctx,
-    //         mouse: this.mouse,
-    //       },
-    //     })
-    //   );
-    // } else {
-    //   this.voidZoneCount -= 1;
-    // }
-  };
-
-  init(target: any) {
-    this.createvoidZone(target);
-    setTimeout(() => {
-      this.createvoidZone(target, true, true);
-    }, 3000);
-  }
+  init(target: any) {}
 
   draw(target: any) {
     createFillCircle(
@@ -138,24 +71,5 @@ export class BaseBossClass extends CoreBase {
         4
       );
     }
-
-    this.voides.forEach((voidZone) => {
-      voidZone.draw(this, target);
-
-      if (voidZone.finish) {
-        this.voides = this.voides.filter((item) => !item.finish);
-      }
-    });
-
-    this.healVoides.forEach((voidZone) => {
-      voidZone.draw(this, target);
-
-      if (this.shield <= this.maxShield / 2) {
-        voidZone.move(this);
-      }
-      if (voidZone.finish) {
-        this.healVoides = this.healVoides.filter((item) => !item.finish);
-      }
-    });
   }
 }
