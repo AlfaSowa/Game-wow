@@ -36,8 +36,16 @@ export class VoidZone extends CoreBase {
     this.moveTo = moveTo;
   }
 
-  change = () => {
-    this.curRadius += 0.1;
+  changeToBig = (value: number = 0.1) => {
+    this.curRadius += value;
+  };
+
+  changeToSmall = (value: number = 0.1) => {
+    if (this.curRadius >= this.radius) {
+      this.curRadius -= value;
+    } else {
+      this.finish = true;
+    }
   };
 
   isMove = (value: boolean) => {
@@ -70,7 +78,7 @@ export class VoidZone extends CoreBase {
 
   createZone = (creator: any, target: any) => {
     if (!this.positive && this.curRadius < this.maxRadius) {
-      this.change();
+      this.changeToBig();
     }
 
     createFillCircle(

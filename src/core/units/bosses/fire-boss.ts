@@ -1,3 +1,4 @@
+import { isTargetsColision } from "../../engine/utils";
 import { VoidZone } from "../../spells/void-zone";
 import { BaseBossClass } from "./base";
 
@@ -45,21 +46,34 @@ export class FireBoss extends BaseBossClass {
 
     setInterval(() => {
       this.createvoidZone(target, true, true);
-    }, 5000);
+    }, 8000);
 
     setInterval(() => {
       this.createvoidZone(target);
-    }, 8000);
+    }, 10000);
   }
 
   draw(target: any) {
     super.draw(target);
+
     this.voides.forEach((voidZone) => {
       voidZone.draw(this, target);
 
       if (voidZone.finish) {
         this.voides = this.voides.filter((item) => !item.finish);
       }
+
+      this.healVoides.forEach((healVoidZone) => {
+        if (isTargetsColision(voidZone, healVoidZone)) {
+          voidZone.changeToBig();
+          if (!healVoidZone.finish) {
+            healVoidZone.changeToSmall(0.3);
+          } else {
+            //TODO сделать норм удаление войды из массива
+            this.healVoides = this.healVoides.filter((item) => !item.finish);
+          }
+        }
+      });
     });
 
     this.healVoides.forEach((voidZone) => {
@@ -78,6 +92,7 @@ export class FireBoss extends BaseBossClass {
       }
 
       if (voidZone.finish) {
+        //TODO сделать норм удаление войды из массива
         this.healVoides = this.healVoides.filter((item) => !item.finish);
       }
     });
