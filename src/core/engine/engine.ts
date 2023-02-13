@@ -1,6 +1,6 @@
 import { ContextType } from "../interfaces";
 
-const PI2 = 2 * Math.PI;
+const PI2: number = 2 * Math.PI;
 
 export const createFillCircle = (
   ctx: ContextType,

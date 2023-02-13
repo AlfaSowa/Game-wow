@@ -13,11 +13,6 @@ export class BaseBossClass extends CoreBase {
   curHp = this.maxHp;
   speed = 1;
 
-  voidZoneCount = 2000;
-  voidZoneCountShow = 300;
-  voides: any[] = [];
-  healVoides: any[] = [];
-
   maxShield = 300;
   shield = this.maxShield;
   shieldRadius = this.radius + 20;

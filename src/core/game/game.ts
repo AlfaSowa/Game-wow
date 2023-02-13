@@ -1,7 +1,7 @@
 import { isMouseOnTarget } from "../engine/utils";
 import { GameCore, CoreOptionsWithoutCoord, MouseType } from "../interfaces";
 import { FireBoss } from "../units/bosses/fire-boss";
-import { BaseHeroClassWithRangeAttack } from "../units/heroes/base";
+import { Mage } from "../units/heroes/hero-types/mage";
 
 interface IGame {
   hero: any;
@@ -38,23 +38,26 @@ export class Game extends GameCore implements IGame {
   init() {
     this.canvas.addEventListener("mousemove", this.setPos);
 
-    this.hero = new BaseHeroClassWithRangeAttack({
+    this.hero = new Mage({
       canvas: this.canvas,
       ctx: this.ctx,
       mouse: this.mouse,
     });
     this.boss = new FireBoss({
-      canvas: this.canvas,
-      ctx: this.ctx,
-      mouse: this.mouse,
+      coreOptions: {
+        canvas: this.canvas,
+        ctx: this.ctx,
+        mouse: this.mouse,
+      },
     });
+
     this.hero.init();
     this.boss.init(this.hero);
 
     this.heroTargets.push(this.boss);
   }
 
-  drawCursor = () => {
+  drawCursor() {
     this.heroTargets.forEach((target) => {
       if (isMouseOnTarget(this.mouse, target)) {
         this.canvas.style.cursor = "crosshair";
@@ -62,11 +65,11 @@ export class Game extends GameCore implements IGame {
         this.canvas.style.cursor = "auto";
       }
     });
-  };
+  }
 
-  draw = () => {
+  draw() {
     this.drawCursor();
     this.hero.draw(this.heroTargets);
     this.boss.draw(this.hero);
-  };
+  }
 }

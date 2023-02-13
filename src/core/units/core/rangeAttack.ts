@@ -31,7 +31,7 @@ export class RangeAttack extends CoreBase {
     this.coord = { x: coord.x, y: coord.y };
   }
 
-  moveBullet = () => {
+  moveBullet() {
     if (this.coord.x !== this.mouse.x || this.coord.y !== this.mouse.y) {
       let delta = {
         x: this.mouse.x - this.coord.x,
@@ -53,9 +53,9 @@ export class RangeAttack extends CoreBase {
         this.finish = true;
       }
     }
-  };
+  }
 
-  createBubble = () => {
+  createBubble() {
     let delta = {
       x: this.objectDamageCoord.x - this.coord.x,
       y: this.objectDamageCoord.y - this.coord.y,
@@ -77,9 +77,9 @@ export class RangeAttack extends CoreBase {
     if (this.bubbleLive <= 0) {
       this.finish = true;
     }
-  };
+  }
 
-  collisionWithObject = (targets: any[], damage: number) => {
+  collisionWithObject(targets: any[], damage: number) {
     targets.forEach((target) => {
       if (target.shield) {
         if (isTargetsColision(target, this)) {
@@ -94,9 +94,9 @@ export class RangeAttack extends CoreBase {
         }
       }
     });
-  };
+  }
 
-  draw = (targets: any[], damage: number) => {
+  draw(targets: any[], damage: number) {
     if (!this.bubble) {
       createFillCircle(
         this.ctx,
@@ -110,5 +110,5 @@ export class RangeAttack extends CoreBase {
     } else {
       this.createBubble();
     }
-  };
+  }
 }

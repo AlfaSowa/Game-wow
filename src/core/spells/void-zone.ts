@@ -1,83 +1,71 @@
 import { createFillCircle } from "../engine/engine";
-import { isTargetsColision } from "../engine/utils";
+import { isTargetsColision, moveElementToTarget } from "../engine/utils";
 import { CoordsType, CoreBase, CoreOptions } from "../interfaces";
+
+type VoidZoneConstructor = {
+  coord: CoordsType;
+  coreOptions: CoreOptions;
+  positiveForCreator: boolean;
+  positiveForTarget: boolean;
+  isSucking: boolean;
+  moveTo: boolean;
+};
 
 export class VoidZone extends CoreBase {
   radius: number = 20;
-  maxRadius: number = 100;
-  color: string = "#5400c3";
-  finish: boolean = false;
-  coord: CoordsType;
-  positive: boolean;
-  isSucking: boolean;
   curRadius: number;
-  vel: number = 1;
+  maxRadius: number = 100;
+  coord: CoordsType;
+
+  positiveForCreator: boolean;
+  positiveForTarget: boolean;
+  finish: boolean = false;
+  isSucking: boolean;
   moveTo: boolean;
+
+  color: string = "#5400c3";
+  vel: number = 1;
 
   constructor({
     coord,
     coreOptions,
-    positive,
+    positiveForCreator,
+    positiveForTarget,
     isSucking,
     moveTo,
-  }: {
-    coord: CoordsType;
-    coreOptions: CoreOptions;
-    positive: boolean;
-    isSucking: boolean;
-    moveTo: boolean;
-  }) {
+  }: VoidZoneConstructor) {
     super(coreOptions);
     this.coord = { x: coord.x, y: coord.y };
-    this.positive = positive;
-    this.color = positive ? "#008a1c80" : "#5400c380";
+    this.positiveForCreator = positiveForCreator;
+    this.positiveForTarget = positiveForTarget;
+    this.color = positiveForTarget ? "#008a1c80" : "#5400c380";
     this.isSucking = isSucking;
-    this.curRadius = positive ? this.maxRadius : this.radius;
+    this.curRadius = positiveForTarget ? this.maxRadius : this.radius;
     this.moveTo = moveTo;
   }
 
-  changeToBig = (value: number = 0.1) => {
+  changeToBig(value: number = 0.1) {
     this.curRadius += value;
-  };
+  }
 
-  changeToSmall = (value: number = 0.1) => {
+  changeToSmall(value: number = 0.1) {
     if (this.curRadius >= this.radius) {
       this.curRadius -= value;
     } else {
       this.finish = true;
     }
-  };
+  }
 
-  isMove = (value: boolean) => {
+  isMove(value: boolean) {
     this.moveTo = value;
-  };
+  }
 
-  moveToCreator = (creator: any) => {
-    if (this.coord.x !== creator.coord.x || this.coord.y !== creator.coord.y) {
-      let delta = {
-        x: creator.coord.x - this.coord.x,
-        y: creator.coord.y - this.coord.y,
-      };
-      let angle = Math.atan2(delta.y, delta.x);
+  moveToTarget(target: any) {
+    moveElementToTarget(this, target);
+  }
 
-      if (
-        this.coord.x > 0 &&
-        this.coord.x < window.innerWidth &&
-        this.coord.y > 0 &&
-        this.coord.y < window.innerHeight
-      ) {
-        this.coord.x += Math.cos(angle) * this.vel;
-        this.coord.y += Math.sin(angle) * this.vel;
-        // creator.coord.x += Math.cos(angle) * this.vel;
-        // creator.coord.y += Math.sin(angle) * this.vel;
-      } else {
-        this.finish = true;
-      }
-    }
-  };
-
-  createZone = (creator: any, target: any) => {
-    if (!this.positive && this.curRadius < this.maxRadius) {
+  createZone(creator: any, target: any) {
+    if (!this.positiveForTarget && this.curRadius < this.maxRadius) {
       this.changeToBig();
     }
 
@@ -90,7 +78,7 @@ export class VoidZone extends CoreBase {
     );
 
     if (isTargetsColision(target, this)) {
-      if (this.positive) {
+      if (this.positiveForTarget) {
         if (target.curHp < target.maxHp) {
           target.curHp += 1;
         }
@@ -105,7 +93,7 @@ export class VoidZone extends CoreBase {
     }
 
     if (isTargetsColision(creator, this)) {
-      if (this.positive) {
+      if (this.positiveForTarget) {
         if (
           creator.curHp <= creator.maxHp ||
           creator.shield <= creator.maxShield
@@ -124,9 +112,9 @@ export class VoidZone extends CoreBase {
         }
       }
     }
-  };
+  }
 
-  draw = (creator: any, target: any) => {
+  draw(creator: any, target: any) {
     this.createZone(creator, target);
-  };
+  }
 }

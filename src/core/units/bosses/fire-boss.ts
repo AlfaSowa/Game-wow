@@ -1,99 +1,124 @@
 import { isTargetsColision } from "../../engine/utils";
+import { CoreOptions } from "../../interfaces";
 import { VoidZone } from "../../spells/void-zone";
 import { BaseBossClass } from "./base";
 
+type DrawVoidZone = {
+  target: any;
+  positiveForTarget: boolean;
+  positiveForCreator: boolean;
+  isSucking: boolean;
+};
+
+type FireBossConstructor = {
+  coreOptions: CoreOptions;
+};
+
 export class FireBoss extends BaseBossClass {
   voidZonesMoveToCreator: boolean = false;
+  coreOptions: CoreOptions;
+  positiveForCreatorVoides: any[] = [];
+  positiveForTargetVoides: any[] = [];
 
-  createvoidZone = (
-    target: any,
-    positive: boolean = false,
-    isSucking: boolean = false
-  ) => {
-    if (positive) {
-      this.healVoides.push(
+  voidZoneCount = 2000;
+  voidZoneCountShow = 300;
+
+  constructor({ coreOptions }: FireBossConstructor) {
+    super(coreOptions);
+    this.coreOptions = coreOptions;
+  }
+
+  drawVoidZone({
+    target,
+    isSucking,
+    positiveForCreator,
+    positiveForTarget,
+  }: DrawVoidZone) {
+    if (positiveForTarget) {
+      this.positiveForTargetVoides.push(
         new VoidZone({
           coord: target.coord,
-          coreOptions: {
-            canvas: this.canvas,
-            ctx: this.ctx,
-            mouse: this.mouse,
-          },
-          positive,
+          coreOptions: this.coreOptions,
+          positiveForTarget,
+          positiveForCreator,
           isSucking,
           moveTo: this.voidZonesMoveToCreator,
         })
       );
     } else {
-      this.voides.push(
+      this.positiveForCreatorVoides.push(
         new VoidZone({
           coord: target.coord,
-          coreOptions: {
-            canvas: this.canvas,
-            ctx: this.ctx,
-            mouse: this.mouse,
-          },
-          positive,
+          coreOptions: this.coreOptions,
+          positiveForTarget,
+          positiveForCreator,
           isSucking,
           moveTo: false,
         })
       );
     }
-  };
+  }
 
   init(target: any) {
     super.init(target);
 
     setInterval(() => {
-      this.createvoidZone(target, true, true);
-    }, 8000);
-
-    setInterval(() => {
-      this.createvoidZone(target);
-    }, 10000);
+      this.drawVoidZone({
+        target,
+        isSucking: true,
+        positiveForCreator: true,
+        positiveForTarget: false,
+      });
+    }, 3000);
   }
 
   draw(target: any) {
     super.draw(target);
 
-    this.voides.forEach((voidZone) => {
-      voidZone.draw(this, target);
+    this.positiveForCreatorVoides.forEach((i) => {
+      i.draw(this, target);
 
-      if (voidZone.finish) {
-        this.voides = this.voides.filter((item) => !item.finish);
+      if (i.finish) {
+        this.positiveForCreatorVoides = this.positiveForCreatorVoides.filter(
+          (e) => !e.finish
+        );
       }
 
-      this.healVoides.forEach((healVoidZone) => {
-        if (isTargetsColision(voidZone, healVoidZone)) {
-          voidZone.changeToBig();
-          if (!healVoidZone.finish) {
-            healVoidZone.changeToSmall(0.3);
+      this.positiveForTargetVoides.forEach((j) => {
+        if (isTargetsColision(i, j)) {
+          i.changeToBig();
+          if (!j.finish) {
+            j.changeToSmall(0.3);
           } else {
             //TODO сделать норм удаление войды из массива
-            this.healVoides = this.healVoides.filter((item) => !item.finish);
+            this.positiveForTargetVoides = this.positiveForTargetVoides.filter(
+              (e) => !e.finish
+            );
           }
         }
       });
     });
 
-    this.healVoides.forEach((voidZone) => {
-      voidZone.draw(this, target);
+    this.positiveForTargetVoides.forEach((i) => {
+      i.draw(this, target);
 
       if (!this.voidZonesMoveToCreator && this.shield <= this.maxShield / 2) {
         this.voidZonesMoveToCreator = true;
       }
 
-      if (this.voidZonesMoveToCreator && !voidZone.moveTo) {
-        voidZone.isMove(true);
+      if (this.voidZonesMoveToCreator && !i.moveTo) {
+        i.isMove(true);
       }
 
-      if (voidZone.moveTo) {
-        voidZone.moveToCreator(this);
+      if (i.moveTo) {
+        i.moveToCreator(this);
       }
 
-      if (voidZone.finish) {
+      if (i.finish) {
         //TODO сделать норм удаление войды из массива
-        this.healVoides = this.healVoides.filter((item) => !item.finish);
+        this.positiveForTargetVoides = this.positiveForTargetVoides.filter(
+          (item) => !item.finish
+        );
       }
     });
   }

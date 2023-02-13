@@ -1,6 +1,6 @@
 import { MouseType } from "../interfaces";
 
-export const randomNumber = (min: number, max: number) => {
+export const randomNumber = (min: number, max: number): number => {
   return Math.random() * (max - min) + min;
 };
 
@@ -45,4 +45,31 @@ export const isMouseOnTarget = (mouse: MouseType, target: any): boolean => {
   }
 
   return false;
+};
+
+export const moveElementToTarget = (element: any, target: any) => {
+  if (
+    element.coord.x !== target.coord.x ||
+    element.coord.y !== target.coord.y
+  ) {
+    let delta = {
+      x: target.coord.x - element.coord.x,
+      y: target.coord.y - element.coord.y,
+    };
+    let angle = Math.atan2(delta.y, delta.x);
+
+    if (
+      element.coord.x > 0 &&
+      element.coord.x < window.innerWidth &&
+      element.coord.y > 0 &&
+      element.coord.y < window.innerHeight
+    ) {
+      element.coord.x += Math.cos(angle) * element.vel;
+      element.coord.y += Math.sin(angle) * element.vel;
+      // target.coord.x += Math.cos(angle) * this.vel;
+      // target.coord.y += Math.sin(angle) * this.vel;
+    } else {
+      element.finish = true;
+    }
+  }
 };
