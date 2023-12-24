@@ -1,25 +1,22 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import {
-  CanvasType,
-  ContextType,
-  CoreOptionsWithNull,
-} from "../../core/interfaces";
+import { useEffect, useRef, useCallback, useState, MutableRefObject } from "react";
 
 type ReturnUseCanvas = {
-  canvasRef: any;
-} & CoreOptionsWithNull;
+  canvasRef: MutableRefObject<HTMLCanvasElement | null>;
+  canvas: HTMLCanvasElement | null;
+  ctx: CanvasRenderingContext2D | null;
+};
 
 const useCanvas = (drawGame: any): ReturnUseCanvas => {
-  const canvasRef = useRef<CanvasType>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   // const contextRef = useRef<ContextType>(null);
-  const [canvas, setCanvas] = useState<CanvasType>(null);
-  const [ctx, setCtx] = useState<ContextType>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
 
   const width = useRef(window.innerWidth);
   const height = useRef(window.innerHeight);
 
   const drawCanvas = useCallback(
-    (ctx: any) => {
+    (ctx: CanvasRenderingContext2D) => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       drawGame();
     },
@@ -39,7 +36,9 @@ const useCanvas = (drawGame: any): ReturnUseCanvas => {
 
       if (!ctx) {
         setCtx(canvasRef.current.getContext("2d"));
-      } else {
+      }
+
+      if (ctx) {
         const render = () => {
           drawCanvas(ctx);
           animationFrameId = window.requestAnimationFrame(render);

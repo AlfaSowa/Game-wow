@@ -1,32 +1,17 @@
-import { Canvas } from "./canvas/canvas";
 import { useCallback, useState } from "react";
-import useCanvas from "./hooks/use-canvas";
-import { Game } from "../core/game/game";
+
 import { GameComponent } from "./hud/game";
+import { GameCustom } from "../game";
 
 export const App = () => {
-  const [game, setGame] = useState<any>(null);
-  const draw = useCallback(() => {
-    if (game) {
-      game.draw();
-    }
-  }, [game]);
-
-  const { canvas, ctx, canvasRef } = useCanvas(draw);
+  const [game, setGame] = useState<GameCustom>();
 
   const starGame = useCallback(() => {
-    if (canvas && ctx) {
-      const game = new Game({ canvas, ctx });
-      game.init();
-      setGame(game);
-    }
-  }, [canvas, ctx, setGame]);
+    const game = new GameCustom();
 
-  return (
-    <>
-      <Canvas canvasRef={canvasRef} />
+    game.init();
+    setGame(game);
+  }, []);
 
-      {!game && <GameComponent starGame={starGame} />}
-    </>
-  );
+  return <>{!game && <GameComponent starGame={starGame} />}</>;
 };
