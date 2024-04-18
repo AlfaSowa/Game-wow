@@ -1,0 +1,1 @@
+export { BaseEntities } from "./base";

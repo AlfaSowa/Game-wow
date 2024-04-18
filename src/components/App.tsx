@@ -10,8 +10,15 @@ export const App = () => {
     const game = new GameCustom();
 
     game.init();
+    game.start();
     setGame(game);
   }, []);
 
-  return <>{!game && <GameComponent starGame={starGame} />}</>;
+  const stopGame = useCallback(() => {
+    if (game) {
+      game.stop();
+    }
+  }, [game]);
+
+  return <>{!game && <GameComponent starGame={starGame} stopGame={stopGame} />}</>;
 };

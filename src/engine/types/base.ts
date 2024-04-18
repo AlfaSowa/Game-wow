@@ -8,3 +8,8 @@ export type MouseType = {
   y: number;
   down: boolean;
 };
+
+export type PosotionType = {
+  x: number;
+  y: number;
+};

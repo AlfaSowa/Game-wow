@@ -1,12 +1,6 @@
-import {
-  IsMouseOnTargetType,
-  IsOnCanavasFieldType,
-  IsTargetsColisionType,
-  MoveElementToTargetType,
-  RandomNumberType,
-} from "./types";
+import { IsMouseOnTargetType, IsOnCanavasFieldType, IsTargetsColisionType, MoveElementToTargetType } from "./types";
 
-export const randomNumber = ({ max, min }: RandomNumberType): number => {
+export const randomNumber = (max: number, min: number): number => {
   return Math.random() * (max - min) + min;
 };
 
