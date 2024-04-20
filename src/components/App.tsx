@@ -20,5 +20,11 @@ export const App = () => {
     }
   }, [game]);
 
-  return <>{!game && <GameComponent starGame={starGame} stopGame={stopGame} />}</>;
+  const pauseGame = useCallback(() => {
+    if (game) {
+      game.pause();
+    }
+  }, [game]);
+
+  return <>{!game && <GameComponent starGame={starGame} stopGame={stopGame} pauseGame={pauseGame} />}</>;
 };

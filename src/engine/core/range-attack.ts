@@ -1,6 +1,6 @@
 import { Draw } from "..";
 import { isTargetsColision, randomNumber } from "../../core/shared";
-import { CoordsType, CustomCoreOptions, MouseCoordType } from "../../game/types";
+import { CoordsType, CustomCoreOptions, MouseCoordType } from "../../game/core";
 
 import { CoreBase } from "./base";
 
@@ -24,17 +24,17 @@ export class RangeAttack extends CoreBase {
 
   constructor({
     mouse,
-    coord,
+    position,
     spread,
     ...args
-  }: CustomCoreOptions & { mouse: MouseCoordType } & { coord: CoordsType } & { spread: number }) {
+  }: CustomCoreOptions & { mouse: MouseCoordType } & { position: CoordsType } & { spread: number }) {
     super(args);
     this.mouse = {
       ...mouse,
       x: mouse.x + randomNumber(-spread, spread),
       y: mouse.y + randomNumber(-spread, spread),
     };
-    this.position = { x: coord.x, y: coord.y };
+    this.position = { x: position.x, y: position.y };
   }
   moveBullet() {
     if (this.position.x !== this.mouse.x || this.position.y !== this.mouse.y) {

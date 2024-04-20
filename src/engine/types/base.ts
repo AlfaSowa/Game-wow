@@ -9,7 +9,12 @@ export type MouseType = {
   down: boolean;
 };
 
-export type PosotionType = {
+export type PositionType = {
   x: number;
   y: number;
+};
+
+export type TargetType = {
+  position: PositionType;
+  radius: number;
 };

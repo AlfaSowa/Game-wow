@@ -1,9 +1,19 @@
 import { Game, RangeAttack } from "./core";
 import { BaseEntities } from "./entities";
-import { drawCircle, drawImage } from "./utils";
+import {
+  drawCircle,
+  drawImage,
+  drawRectangle,
+  isMouseOnTarget,
+  isOnCanavasField,
+  isTargetsColision,
+  moveElementToTarget,
+  unitMovement,
+} from "./utils";
 
 export const Draw = {
   Circle: drawCircle,
+  Rect: drawRectangle,
   Image: drawImage,
 };
 
@@ -13,5 +23,14 @@ export const Engine = {
   RangeAttack: RangeAttack,
   Entities: {
     add: BaseEntities,
+  },
+  Utils: {
+    isOnCanavasField: isOnCanavasField,
+    isTargetsColision: isTargetsColision,
+    isMouseOnTarget: isMouseOnTarget,
+    moveElementToTarget: moveElementToTarget,
+  },
+  Helpers: {
+    unitMovement: unitMovement,
   },
 };

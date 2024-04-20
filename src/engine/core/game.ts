@@ -23,13 +23,16 @@ export class Game {
   start(draw: any) {
     const render = () => {
       if (this.context) {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        this.context.fillStyle = "#f2f2f2";
+        this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        // this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
       }
       if (draw) {
         draw();
       }
       this.animationFrameId = window.requestAnimationFrame(render);
     };
+
     render();
   }
 

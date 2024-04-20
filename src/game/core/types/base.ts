@@ -30,5 +30,5 @@ export type UnitBaseConstructor = {
 
 export type TargetType = {
   position: CoordsType;
-  radius?: number;
+  radius: number;
 };
