@@ -1,5 +1,6 @@
 import { Game, RangeAttack } from "./core";
 import { BaseEntities } from "./entities";
+import { Sprite } from "./sprite";
 import {
   drawCircle,
   drawImage,
@@ -33,4 +34,5 @@ export const Engine = {
   Helpers: {
     unitMovement: unitMovement,
   },
+  Sprite: Sprite,
 };

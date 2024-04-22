@@ -9,7 +9,6 @@ type BarConstructorType = CustomCoreOptions & {
 };
 
 export class Bar {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
   width: number = 400;
@@ -19,8 +18,7 @@ export class Bar {
 
   value: number = this.width;
 
-  constructor({ canvas, ctx, height, position, width }: BarConstructorType) {
-    this.canvas = canvas;
+  constructor({ ctx, height, position, width }: BarConstructorType) {
     this.ctx = ctx;
     this.height = height || 20;
     this.width = width || 400;

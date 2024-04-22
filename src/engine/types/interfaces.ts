@@ -1,22 +1,18 @@
 import { ICoreOptions, MouseType } from "./base";
 
 export class CoreBaseWithoutMouse implements ICoreOptions {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
-  constructor({ canvas, ctx }: ICoreOptions) {
-    this.canvas = canvas;
+  constructor({ ctx }: ICoreOptions) {
     this.ctx = ctx;
   }
 }
 
 export class CoreBase implements ICoreOptions {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   mouse: MouseType;
 
-  constructor({ canvas, ctx, mouse }: ICoreOptions & { mouse: MouseType }) {
-    this.canvas = canvas;
+  constructor({ ctx, mouse }: ICoreOptions & { mouse: MouseType }) {
     this.ctx = ctx;
     this.mouse = mouse;
   }

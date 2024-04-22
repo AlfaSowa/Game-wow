@@ -1,5 +1,4 @@
 export interface ICoreOptions {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 }
 

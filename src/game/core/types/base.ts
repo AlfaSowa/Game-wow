@@ -1,5 +1,4 @@
 export interface CustomCoreOptions {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 }
 
@@ -24,7 +23,6 @@ export type MovesKeys = "KeyW" | "KeyA" | "KeyS" | "KeyD";
 
 export type UnitBaseConstructor = {
   maxHp: number;
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 };
 

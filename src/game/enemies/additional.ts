@@ -20,7 +20,6 @@ export class Additional extends EnemyBase {
   init(target: TargetType) {
     super.init(target);
     this.hpBar = new Bar({
-      canvas: this.canvas,
       ctx: this.ctx,
       height: HEIGHT_HP_BAR,
       width: WIDTH_HP_BAR,

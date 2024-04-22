@@ -1,30 +1,36 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from 'react'
 
-import { GameComponent } from "./hud/game";
-import { GameCustom } from "../game";
+import { GameComponent } from './hud/game'
+import { GameCustom } from '../game'
 
 export const App = () => {
-  const [game, setGame] = useState<GameCustom>();
+  const [game, setGame] = useState<GameCustom>()
+  const canvasRef = useRef(null)
 
   const starGame = useCallback(() => {
-    const game = new GameCustom();
+    const game = new GameCustom()
 
-    game.init();
-    game.start();
-    setGame(game);
-  }, []);
+    game.init(canvasRef.current)
+    game.start()
+    setGame(game)
+  }, [])
 
   const stopGame = useCallback(() => {
     if (game) {
-      game.stop();
+      game.stop()
     }
-  }, [game]);
+  }, [game])
 
   const pauseGame = useCallback(() => {
     if (game) {
-      game.pause();
+      game.pause()
     }
-  }, [game]);
+  }, [game])
 
-  return <>{!game && <GameComponent starGame={starGame} stopGame={stopGame} pauseGame={pauseGame} />}</>;
-};
+  return (
+    <>
+      {!game && <GameComponent starGame={starGame} stopGame={stopGame} pauseGame={pauseGame} />}
+      <div className="h-screen w-screen flex items-center justify-center bg-green-200" ref={canvasRef} />
+    </>
+  )
+}

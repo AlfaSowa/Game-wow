@@ -1,11 +1,9 @@
 import { ICoreOptions } from "../types";
 
 export class CoreBase implements ICoreOptions {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
-  constructor({ canvas, ctx }: ICoreOptions) {
-    this.canvas = canvas;
+  constructor({ ctx }: ICoreOptions) {
     this.ctx = ctx;
   }
 }

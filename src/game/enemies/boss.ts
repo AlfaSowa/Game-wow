@@ -12,7 +12,7 @@ export class Boss extends EnemyBase {
 
   init(target: TargetType) {
     super.init(target);
-    this.hpBar = new Bar({ canvas: this.canvas, ctx: this.ctx });
+    this.hpBar = new Bar({ ctx: this.ctx });
   }
 
   drawBar() {
