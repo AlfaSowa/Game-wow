@@ -1,40 +1,55 @@
-import { Engine } from '../../engine'
+import { CoreBaseConstructorType, Draw, Engine, MouseType, MoveMovesKeys, TargetType } from '../../engine'
 import { Sprite } from '../../engine/sprite'
-import { CustomCoreOptions, MouseCoordType, MovesKeys, TargetType } from '../core'
 import { UnitBase } from '../units'
 import testNPCImage from '../assets/NPC-Merchant-interaction-entry.png'
+import { Boss } from '../enemies'
+import { RangeAttack } from '../../engine/core'
+import { Bar } from '../entities'
 
-type EntitiesType = { mainTarget: any; adds?: any[] }
+type EntitiesType = { entities: Boss[] }
+type DrawPlayerProps = EntitiesType & { bounds?: number }
 export class Player extends UnitBase {
   KeyW: boolean = false
   KeyA: boolean = false
   KeyS: boolean = false
   KeyD: boolean = false
 
-  mouse: MouseCoordType = {
+  mouse: MouseType = {
     x: 0,
     y: 0,
     down: false
   }
 
-  damage: number = 100
-  borderCAnvas: number = 32
+  damage: number = 50
 
   sprite: Sprite | null = null
-  color: string = 'red'
+  color: string = '#FD0006'
 
-  constructor({ mouse, borderCAnvas, ...args }: CustomCoreOptions & { mouse: MouseCoordType; borderCAnvas: number }) {
-    super({ maxHp: 500, ...args })
+  healthBar: Bar
+  dashBar: Bar
+
+  vel: number = 2
+
+  dashElapsed: number = 0
+  dashHold: number = 7
+
+  dashDelayElapsed: number = 0
+  dashDelayHold: number = 300
+
+  isDash: boolean = false
+  dashDelay: boolean = false
+
+  constructor({ mouse, ...args }: CoreBaseConstructorType & { mouse: MouseType }) {
+    super({ health: 500, position: { x: args.ctx.canvas.width / 2, y: args.ctx.canvas.height - 100 }, ...args })
+
     this.mouse = mouse
-    this.borderCAnvas = borderCAnvas
-  }
 
-  setTarget() {
-    this.target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
+    this.healthBar = new Bar({ ctx: this.ctx, color: '#58E000', width: 400, position: { x: args.ctx.canvas.width / 2 - 200, y: args.ctx.canvas.height - 42 } })
+    this.dashBar = new Bar({ ctx: this.ctx, color: '#9E9E9E', width: 50, height: 5, position: this.position, value: 0 })
   }
 
   baseAttack() {
-    this.setTarget()
+    this.target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
 
     let delta = { x: this.target.position.x - this.position.x, y: this.target.position.y - this.position.y }
     let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
@@ -49,76 +64,99 @@ export class Player extends UnitBase {
     this.attaks.push(attack)
   }
 
-  unitMovement() {
-    Engine.Helpers.unitMovement(this, this.borderCAnvas)
+  unitMovement(bounds?: number) {
+    Engine.Helpers.unitMovement(this, bounds)
   }
 
   onKeyPress(e: KeyboardEvent, value: boolean) {
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
-      this[e.code as MovesKeys] = value
+      this[e.code as MoveMovesKeys] = value
+    }
+
+    if (e.code === 'Space' && !this.dashDelay) {
+      this.dashDelay = true
+      this.isDash = true
     }
   }
 
-  drawAttacks({ mainTarget, adds }: EntitiesType) {
-    this.attaks.forEach((attack) => {
-      attack.draw()
+  drawAttacks(entities: Boss[]) {
+    for (let i = 0; i < this.attaks.length; i++) {
+      this.attaks[i].draw()
 
-      if (mainTarget) {
-        this.isCollisionWithProjectile(mainTarget, attack)
+      for (let j = 0; j < entities.length; j++) {
+        this.isCollisionWithProjectile(entities[j], this.attaks[i])
       }
 
-      if (adds && adds.length > 0) {
-        for (let i = 0; i < adds.length; i++) {
-          this.isCollisionWithProjectile(adds[i], attack)
-        }
-      }
-
-      if (attack.finish) {
+      if (this.attaks[i].finish) {
         this.attaks = this.attaks.filter((item) => !item.finish)
       }
-    })
+    }
   }
 
-  isCollisionWithTargets({ mainTarget, adds }: EntitiesType) {
+  affectWithCollision(entities: Boss[]) {
+    for (let j = 0; j < entities.length; j++) {
+      this.isCollisionWithTargets(entities[j])
+    }
+  }
+
+  isCollisionWithTargets(entity: Boss) {
     const isCollision = Engine.Utils.isTargetsColision({
       positionTargetA: { position: this.position, radius: this.radius },
-      positionTargetB: { position: mainTarget.position, radius: mainTarget.radius }
+      positionTargetB: { position: entity.position, radius: entity.radius }
     })
 
     if (isCollision) {
-      this.color = 'grey'
-    }
-
-    if (adds && adds.length > 0) {
-      for (let i = 0; i < adds.length; i++) {
-        const isCollision = Engine.Utils.isTargetsColision({
-          positionTargetA: { position: this.position, radius: this.radius },
-          positionTargetB: { position: adds[i].position, radius: adds[i].radius }
-        })
-
-        if (isCollision) {
-          this.color = 'grey'
-        }
-      }
+      Draw.Circle({ ctx: this.ctx, radius: this.radius + 20, position: this.position, color: this.color, fill: false })
+      this.currentHealth -= entity.damageOnCollision
     }
   }
 
-  isCollisionWithProjectile(element: any, projectile: any) {
+  isCollisionWithProjectile(element: Boss, projectile: RangeAttack) {
     const isCollision = Engine.Utils.isTargetsColision({
       positionTargetA: { position: projectile.position, radius: projectile.radius },
       positionTargetB: { position: element.position, radius: element.radius } as TargetType
     })
 
-    if (isCollision) {
-      element.curHp -= this.damage
-      projectile.finish = true
+    if (isCollision && !projectile.isAffectStart) {
+      element.affectWithTakeDamage(this.damage)
+
+      projectile.targetPosition = element.position
+      projectile.targetRadius = element.radius
+      projectile.isAffectStart = true
+    }
+  }
+
+  drawBars() {
+    this.healthBar.draw((arg) => {
+      return this.currentHealth / (this.health / arg)
+    })
+
+    if (this.dashDelay) {
+      this.dashBar.draw((arg) => {
+        console.log(arg)
+        return this.dashDelayElapsed / (this.dashDelayHold / arg)
+      }, 'inc')
+    }
+  }
+
+  dash() {
+    if (this.dashDelay) {
+      Engine.Helpers.delayToCallback('dashDelayElapsed', 'dashDelayHold', this, () => {
+        this.dashDelay = false
+      })
+    }
+    if (this.isDash) {
+      this.vel = 10
+
+      Engine.Helpers.delayToCallback('dashElapsed', 'dashHold', this, () => {
+        this.vel = 2
+        this.isDash = false
+      })
     }
   }
 
   init() {
     super.init()
-
-    this.position = { x: window.innerWidth / 2, y: window.innerHeight - 100 }
 
     this.sprite = new Sprite({
       ctx: this.ctx,
@@ -138,7 +176,8 @@ export class Player extends UnitBase {
           sy: 0
         }
       },
-      isCentered: true
+      isCentered: true,
+      maxFrames: 8
     })
 
     window.addEventListener('mousedown', () => this.baseAttack())
@@ -152,12 +191,16 @@ export class Player extends UnitBase {
     }
   }
 
-  draw({ mainTarget, adds }: EntitiesType) {
+  draw({ entities, bounds }: DrawPlayerProps) {
     super.draw()
 
-    this.drawAttacks({ mainTarget, adds })
+    this.drawAttacks(entities)
     this.shape()
-    this.unitMovement()
-    // this.isCollisionWithTargets({ mainTarget, adds });
+    this.unitMovement(bounds)
+
+    this.affectWithCollision(entities)
+    this.drawBars()
+
+    this.dash()
   }
 }

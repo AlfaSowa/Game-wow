@@ -1,5 +1,5 @@
-import { Draw } from '..'
-import { CoreBaseWithoutMouse, ICoreOptions, PositionType } from '../types'
+import { Draw, Engine } from '..'
+import { CoreBaseWithoutMouse, CoreBaseConstructorType, PositionType } from '../types'
 
 type SourceImageType = {
   x: number
@@ -8,7 +8,7 @@ type SourceImageType = {
   height?: number
 }
 
-type SpriteConstructorType = ICoreOptions & {
+type SpriteConstructorType = CoreBaseConstructorType & {
   position: PositionType
   width?: number
   height?: number
@@ -18,6 +18,8 @@ type SpriteConstructorType = ICoreOptions & {
   ImageSourceComparator?: (img: any, curFrame?: number) => { sx: number; sy: number }
   animated?: boolean
   isCentered?: boolean
+  maxFrames?: number
+  frameHold?: number
 }
 
 export class Sprite extends CoreBaseWithoutMouse {
@@ -30,6 +32,7 @@ export class Sprite extends CoreBaseWithoutMouse {
   sourceImage?: SourceImageType = undefined
 
   currentFrame: number = 0
+  maxFrames: number = 0
 
   animated: boolean = true
   isCentered: boolean = false
@@ -40,7 +43,7 @@ export class Sprite extends CoreBaseWithoutMouse {
   frameElapsed: number = 0
   frameHold: number = 10
 
-  constructor({ position, height, width, src, sourceImage, ImageClipComparator, ImageSourceComparator, animated = true, isCentered = false, ...args }: SpriteConstructorType) {
+  constructor({ position, height, width, src, sourceImage, ImageClipComparator, ImageSourceComparator, animated = true, isCentered = false, maxFrames, frameHold, ...args }: SpriteConstructorType) {
     super(args)
     this.position = position
 
@@ -53,6 +56,9 @@ export class Sprite extends CoreBaseWithoutMouse {
     this.animated = animated
     this.isCentered = isCentered
 
+    this.maxFrames = maxFrames || 0
+    this.frameHold = frameHold || 10
+
     this.ImageClipComparator = ImageClipComparator
 
     if (animated) {
@@ -63,23 +69,19 @@ export class Sprite extends CoreBaseWithoutMouse {
   }
 
   frameUpdater() {
-    this.frameElapsed++
-
-    if (this.frameElapsed % this.frameHold === 0) {
-      this.frameElapsed = 0
-
-      if (this.currentFrame < 8 - 1) {
+    Engine.Helpers.delayToCallback('frameElapsed', 'frameHold', this, () => {
+      if (this.currentFrame < this.maxFrames - 1) {
         this.currentFrame++
       } else {
         this.currentFrame = 0
       }
-    }
+    })
   }
 
   draw() {
-    if (this.animated) {
-      this.frameUpdater()
-    }
+    // if (this.animated) {
+    //   this.frameUpdater()
+    // }
 
     Draw.Image({
       ctx: this.ctx,

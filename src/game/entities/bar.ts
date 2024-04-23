@@ -1,52 +1,59 @@
-import { Draw } from "../../engine";
-import { PositionType } from "../../engine/types";
-import { CustomCoreOptions } from "../core";
+import { Draw } from '../../engine'
+import { CoreBaseConstructorType, PositionType } from '../../engine/types'
 
-type BarConstructorType = CustomCoreOptions & {
-  width?: number;
-  height?: number;
-  position?: PositionType;
-};
+type BarConstructorType = CoreBaseConstructorType & {
+  width?: number
+  height?: number
+  position?: PositionType
+  color?: string
+  value?: number
+}
 
+type ComparatorType = 'inc' | 'dec'
 export class Bar {
-  ctx: CanvasRenderingContext2D;
+  ctx: CanvasRenderingContext2D
 
-  width: number = 400;
-  height: number = 20;
+  width: number = 400
+  height: number = 20
 
-  position: PositionType = { x: 0, y: 0 };
+  position: PositionType = { x: 0, y: 0 }
 
-  value: number = this.width;
+  value: number
 
-  constructor({ ctx, height, position, width }: BarConstructorType) {
-    this.ctx = ctx;
-    this.height = height || 20;
-    this.width = width || 400;
-    this.position = position || { x: ctx.canvas.width / 2 - this.width / 2, y: 20 };
+  color: string
+
+  constructor({ ctx, height, position, width, color, value }: BarConstructorType) {
+    this.ctx = ctx
+    this.height = height || 20
+    this.width = width || 400
+    this.value = value ?? width ?? 400
+    this.position = position || { x: ctx.canvas.width / 2 - this.width / 2, y: 16 }
+
+    this.color = color || 'red'
   }
 
   init() {}
 
-  draw(comparator: (arg: number) => number) {
+  draw(comparator: (arg: number) => number, type: ComparatorType = 'dec') {
     Draw.Rect({
       ctx: this.ctx,
       position: this.position,
-      color: "#000",
+      color: '#000',
       height: this.height,
       width: this.width,
-      fill: false,
-    });
+      fill: false
+    })
 
-    if (this.value > 0) {
-      this.value = comparator(this.width);
+    if (type === 'dec' ? this.value > 0 : this.value < this.width) {
+      this.value = comparator(this.width)
     }
 
     Draw.Rect({
       ctx: this.ctx,
       position: this.position,
-      color: "red",
+      color: this.color,
       height: this.height,
-      width: this.value,
-    });
+      width: this.value
+    })
   }
 }

@@ -1,31 +1,37 @@
-import { CoordsType, TargetType, UnitBaseConstructor } from "../core";
+import { PositionType, TargetType } from '../../engine'
+
+export type UnitBaseConstructor = {
+  health: number
+  ctx: CanvasRenderingContext2D
+  position: PositionType
+}
 
 export class UnitBase {
   target: TargetType = {
     position: { x: 0, y: 0 },
-    radius: 0,
-  };
+    radius: 0
+  }
 
-  maxHp: number = 0;
-  curHp: number = 0;
-  exist: boolean = true;
+  health: number = 0
+  currentHealth: number = 0
+  isExist: boolean = true
 
-  attaks: any[] = [];
+  attaks: any[] = []
 
-  radius = 35;
+  radius = 35
 
-  canvas: any;
-  ctx: any;
+  canvas: any
+  ctx: any
 
-  vel: number = 3;
+  vel: number = 3
 
-  position: CoordsType = { x: 0, y: 0 };
+  position: PositionType = { x: 0, y: 0 }
 
-  constructor({ maxHp, ctx }: UnitBaseConstructor) {
-    this.maxHp = maxHp;
-    this.curHp = maxHp;
-    this.ctx = ctx;
-    this.position = { x: ctx.canvas.width / 2, y: 200 };
+  constructor({ health, ctx, position }: UnitBaseConstructor) {
+    this.health = health
+    this.currentHealth = health
+    this.ctx = ctx
+    this.position = position
   }
 
   init(params?: any) {}

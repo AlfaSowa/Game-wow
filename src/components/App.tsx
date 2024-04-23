@@ -5,12 +5,12 @@ import { GameCustom } from '../game'
 
 export const App = () => {
   const [game, setGame] = useState<GameCustom>()
-  const canvasRef = useRef(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
 
   const starGame = useCallback(() => {
-    const game = new GameCustom()
+    const game = new GameCustom(canvasRef.current)
 
-    game.init(canvasRef.current)
+    game.init()
     game.start()
     setGame(game)
   }, [])

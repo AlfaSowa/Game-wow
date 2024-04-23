@@ -1,44 +1,74 @@
-import { Draw } from '..'
-import { isTargetsColision, randomNumber } from '../../core/shared'
-import { CoordsType, CustomCoreOptions, MouseCoordType } from '../../game/core'
+import { CoreBaseConstructorType, Draw, Engine, MouseType, PositionType } from '..'
+import { CoreBase } from '../types'
+import { randomNumber } from '../utils'
 
-import { CoreBase } from './base'
+export const PI2: number = (2 * Math.PI) / 2
 
 export class RangeAttack extends CoreBase {
   radius = 8
   finish = false
   vel = 10
   color = '#0dedff'
-  position: CoordsType = { x: 0, y: 0 }
-  objectDamageCoord: CoordsType = { x: 0, y: 0 }
-  bubble = false
-  bubbleRadius = randomNumber(1, 5)
-  bubbleLive = 2
-  bubbleFading = randomNumber(0.1, 0.02)
+  position: PositionType = { x: 0, y: 0 }
 
-  mouse: MouseCoordType = {
-    x: 0,
-    y: 0,
-    down: false
-  }
+  affectRadius = randomNumber(1, 5)
 
-  constructor({ mouse, position, spread, ...args }: CustomCoreOptions & { mouse: MouseCoordType } & { position: CoordsType } & { spread: number }) {
-    super(args)
-    this.mouse = {
-      ...mouse,
-      x: mouse.x + randomNumber(-spread, spread),
-      y: mouse.y + randomNumber(-spread, spread)
-    }
+  frameElapsed: number = 0
+  frameHold: number = 30
+
+  isAffectStart: boolean = false
+
+  targetPosition: PositionType = { x: 0, y: 0 }
+  targetRadius: number = 0
+
+  constructor({ mouse, position, spread, ...args }: CoreBaseConstructorType & { mouse: MouseType } & { position: PositionType } & { spread: number }) {
+    super({
+      mouse: {
+        ...mouse,
+        x: mouse.x + randomNumber(-spread, spread),
+        y: mouse.y + randomNumber(-spread, spread)
+      },
+      ...args
+    })
+
     this.position = { x: position.x, y: position.y }
   }
-  moveBullet() {
+
+  affectDraw() {
+    let delta = {
+      x: this.targetPosition.x - this.position.x,
+      y: this.targetPosition.y - this.position.y
+    }
+
+    // let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
+
+    let angle = Math.atan2(delta.y, delta.x)
+
+    this.position.x -= Math.cos(angle) * 2
+    this.position.y -= Math.sin(angle) * 2
+
+    Draw.Circle({ ctx: this.ctx, radius: this.affectRadius, position: this.position, color: this.color })
+
+    this.ctx.strokeStyle = this.color
+    this.ctx.beginPath()
+    this.ctx.arc(this.targetPosition.x, this.targetPosition.y, this.targetRadius, Math.cos(angle), Math.PI + (Math.PI * Math.cos(angle)) / 2)
+    this.ctx.stroke()
+
+    Engine.Helpers.delayToCallback('frameElapsed', 'frameHold', this, () => {
+      this.finish = true
+    })
+  }
+
+  moveProjectile() {
     if (this.position.x !== this.mouse.x || this.position.y !== this.mouse.y) {
       let delta = {
         x: this.mouse.x - this.position.x,
         y: this.mouse.y - this.position.y
       }
+
       let angle = Math.atan2(delta.y, delta.x)
-      if (this.position.x > 0 && this.position.x < window.innerWidth && this.position.y > 0 && this.position.y < window.innerHeight) {
+
+      if (this.position.x > 0 && this.position.x < this.ctx.canvas.width && this.position.y > 0 && this.position.y < this.ctx.canvas.height) {
         this.position.x += Math.cos(angle) * this.vel
         this.position.y += Math.sin(angle) * this.vel
         this.mouse.x += Math.cos(angle) * this.vel
@@ -48,43 +78,19 @@ export class RangeAttack extends CoreBase {
       }
     }
   }
-  createBubble() {
-    let delta = {
-      x: this.objectDamageCoord.x - this.position.x,
-      y: this.objectDamageCoord.y - this.position.y
-    }
-    let angle = Math.atan2(delta.y, delta.x)
-    this.position.x -= Math.cos(angle) * 2
-    this.position.y -= Math.sin(angle) * 2
-    Draw.Circle({ ctx: this.ctx, radius: this.radius, position: this.position, color: '#0dedff' })
-    this.bubbleLive -= this.bubbleFading
-    if (this.bubbleLive <= 0) {
-      this.finish = true
-    }
-  }
-  collisionWithObject(targets: any[], damage: number) {
-    targets.forEach((target) => {
-      if (target.shield) {
-        if (isTargetsColision({ targetA: target, targetB: this })) {
-          this.bubble = true
-          this.objectDamageCoord = { x: target.coord.x, y: target.coord.y }
-          target.shield -= damage
-        }
-      } else {
-        if (isTargetsColision({ targetA: target, targetB: this })) {
-          this.finish = true
-          target.curHp -= damage
-        }
-      }
-    })
-  }
-  draw() {
-    if (!this.bubble) {
+
+  drawProjectile() {
+    if (!this.isAffectStart) {
       Draw.Circle({ ctx: this.ctx, radius: this.radius, position: this.position, color: this.color })
-      this.moveBullet()
-      // this.collisionWithObject(targets, damage);
-    } else {
-      this.createBubble()
+      this.moveProjectile()
+    }
+  }
+
+  draw() {
+    this.drawProjectile()
+
+    if (this.isAffectStart) {
+      this.affectDraw()
     }
   }
 }

@@ -1,10 +1,10 @@
 import { Sprite } from '../../engine/sprite'
-import { CustomCoreOptions } from '../core'
+
 import TailsetImg from '../assets/tileset_version1.1.png'
 import { TAILS } from './const'
-import { Draw } from '../../engine'
+import { CoreBaseConstructorType, Draw } from '../../engine'
 
-type TailsetMapConstructorType = CustomCoreOptions & {
+type TailsetMapConstructorType = CoreBaseConstructorType & {
   tailSize: number
   tailsGap: number
 }
