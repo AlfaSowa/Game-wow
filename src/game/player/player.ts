@@ -4,7 +4,8 @@ import { UnitBase } from '../units'
 import testNPCImage from '../assets/NPC-Merchant-interaction-entry.png'
 import { Boss } from '../enemies'
 import { RangeAttack } from '../../engine/core'
-import { Bar } from '../entities'
+import { Bar, VoidZone } from '../entities'
+import { log } from 'console'
 
 type EntitiesType = { entities: Boss[] }
 type DrawPlayerProps = EntitiesType & { bounds?: number }
@@ -13,6 +14,7 @@ export class Player extends UnitBase {
   KeyA: boolean = false
   KeyS: boolean = false
   KeyD: boolean = false
+  KeyQ: boolean = false
 
   mouse: MouseType = {
     x: 0,
@@ -39,29 +41,66 @@ export class Player extends UnitBase {
   isDash: boolean = false
   dashDelay: boolean = false
 
+  healZone: VoidZone | null = null
+  healZoneElapse: number = 0
+  healZoneHold: number = 200
+  healZoneRaius: number = 100
+
   constructor({ mouse, ...args }: CoreBaseConstructorType & { mouse: MouseType }) {
-    super({ health: 500, position: { x: args.ctx.canvas.width / 2, y: args.ctx.canvas.height - 100 }, ...args })
+    super({
+      health: 500,
+      position: { x: args.ctx.canvas.width / 2, y: args.ctx.canvas.height - 100 },
+      ...args
+    })
 
     this.mouse = mouse
 
-    this.healthBar = new Bar({ ctx: this.ctx, color: '#58E000', width: 400, position: { x: args.ctx.canvas.width / 2 - 200, y: args.ctx.canvas.height - 42 } })
-    this.dashBar = new Bar({ ctx: this.ctx, color: '#9E9E9E', width: 50, height: 5, position: this.position, value: 0 })
+    this.healthBar = new Bar({
+      ctx: this.ctx,
+      color: '#58E000',
+      width: 400,
+      position: { x: args.ctx.canvas.width / 2 - 200, y: args.ctx.canvas.height - 42 }
+    })
+    this.dashBar = new Bar({
+      ctx: this.ctx,
+      color: '#9E9E9E',
+      width: 50,
+      height: 5,
+      position: this.position,
+      value: 0
+    })
   }
 
   baseAttack() {
-    this.target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
+    if (!this.KeyQ) {
+      this.target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
 
-    let delta = { x: this.target.position.x - this.position.x, y: this.target.position.y - this.position.y }
-    let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
+      let delta = {
+        x: this.target.position.x - this.position.x,
+        y: this.target.position.y - this.position.y
+      }
+      let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
 
-    const attack = new Engine.RangeAttack({
-      ctx: this.ctx,
-      mouse: this.mouse,
-      position: this.position,
-      spread: dist * 0.04
-    })
+      const attack = new Engine.RangeAttack({
+        ctx: this.ctx,
+        mouse: this.mouse,
+        position: this.position,
+        spread: dist * 0.04
+      })
 
-    this.attaks.push(attack)
+      this.attaks.push(attack)
+    } else {
+      this.healZone = new VoidZone({
+        ctx: this.ctx,
+        position: { x: this.mouse.x, y: this.mouse.y },
+        heal: 0.1,
+        radius: this.healZoneRaius,
+        color: '#62E200'
+      })
+      Engine.Helpers.delayToCallback('healZoneElapse', 'healZoneHold', this, () => {
+        this.healZone = null
+      })
+    }
   }
 
   unitMovement(bounds?: number) {
@@ -77,8 +116,25 @@ export class Player extends UnitBase {
       this.dashDelay = true
       this.isDash = true
     }
+
+    if (e.code === 'KeyQ') {
+      this.KeyQ = value
+    }
   }
 
+  powerOfKeyCode() {
+    if (this.KeyQ) {
+      Draw.Circle({
+        ctx: this.ctx,
+        radius: this.healZoneRaius,
+        position: this.mouse,
+        color: this.color,
+        fill: false
+      })
+    }
+  }
+
+  //TODO перенести в RangeAttack
   drawAttacks(entities: Boss[]) {
     for (let i = 0; i < this.attaks.length; i++) {
       this.attaks[i].draw()
@@ -93,6 +149,7 @@ export class Player extends UnitBase {
     }
   }
 
+  //TODO подумать нат неймингом
   affectWithCollision(entities: Boss[]) {
     for (let j = 0; j < entities.length; j++) {
       this.isCollisionWithTargets(entities[j])
@@ -106,11 +163,18 @@ export class Player extends UnitBase {
     })
 
     if (isCollision) {
-      Draw.Circle({ ctx: this.ctx, radius: this.radius + 20, position: this.position, color: this.color, fill: false })
+      Draw.Circle({
+        ctx: this.ctx,
+        radius: this.radius + 20,
+        position: this.position,
+        color: this.color,
+        fill: false
+      })
       this.currentHealth -= entity.damageOnCollision
     }
   }
 
+  //TODO перенести в RangeAttack
   isCollisionWithProjectile(element: Boss, projectile: RangeAttack) {
     const isCollision = Engine.Utils.isTargetsColision({
       positionTargetA: { position: projectile.position, radius: projectile.radius },
@@ -126,6 +190,7 @@ export class Player extends UnitBase {
     }
   }
 
+  //TODO частично перенести в Bar чтобы не передавать comparator
   drawBars() {
     this.healthBar.draw((arg) => {
       return this.currentHealth / (this.health / arg)
@@ -133,9 +198,18 @@ export class Player extends UnitBase {
 
     if (this.dashDelay) {
       this.dashBar.draw((arg) => {
-        console.log(arg)
         return this.dashDelayElapsed / (this.dashDelayHold / arg)
       }, 'inc')
+    }
+  }
+
+  affectWithTarget(damage: number) {
+    this.currentHealth -= damage
+  }
+
+  healWithTarget(heal: number) {
+    if (this.currentHealth <= this.health) {
+      this.currentHealth += heal
     }
   }
 
@@ -195,12 +269,18 @@ export class Player extends UnitBase {
     super.draw()
 
     this.drawAttacks(entities)
-    this.shape()
     this.unitMovement(bounds)
 
+    this.powerOfKeyCode()
+
+    if (this.healZone) {
+      this.healZone.draw(this)
+    }
+
     this.affectWithCollision(entities)
-    this.drawBars()
 
     this.dash()
+    this.shape()
+    this.drawBars()
   }
 }

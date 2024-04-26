@@ -14,7 +14,12 @@ type SpriteConstructorType = CoreBaseConstructorType & {
   height?: number
   src: string
   sourceImage?: SourceImageType
-  ImageClipComparator?: (img: any) => { sWidth: number; sHeight: number; dWidth: number; dHeight: number }
+  ImageClipComparator?: (img: any) => {
+    sWidth: number
+    sHeight: number
+    dWidth: number
+    dHeight: number
+  }
   ImageSourceComparator?: (img: any, curFrame?: number) => { sx: number; sy: number }
   animated?: boolean
   isCentered?: boolean
@@ -37,13 +42,31 @@ export class Sprite extends CoreBaseWithoutMouse {
   animated: boolean = true
   isCentered: boolean = false
 
-  ImageClipComparator?: (img: any) => { sWidth: number; sHeight: number; dWidth: number; dHeight: number } = undefined
+  ImageClipComparator?: (img: any) => {
+    sWidth: number
+    sHeight: number
+    dWidth: number
+    dHeight: number
+  } = undefined
   ImageSourceComparator?: (img: any) => { sx: number; sy: number } = undefined
 
   frameElapsed: number = 0
   frameHold: number = 10
 
-  constructor({ position, height, width, src, sourceImage, ImageClipComparator, ImageSourceComparator, animated = true, isCentered = false, maxFrames, frameHold, ...args }: SpriteConstructorType) {
+  constructor({
+    position,
+    height,
+    width,
+    src,
+    sourceImage,
+    ImageClipComparator,
+    ImageSourceComparator,
+    animated = true,
+    isCentered = false,
+    maxFrames,
+    frameHold,
+    ...args
+  }: SpriteConstructorType) {
     super(args)
     this.position = position
 
@@ -62,7 +85,9 @@ export class Sprite extends CoreBaseWithoutMouse {
     this.ImageClipComparator = ImageClipComparator
 
     if (animated) {
-      this.ImageSourceComparator = ImageSourceComparator ? (img) => ImageSourceComparator(img, this.currentFrame) : undefined
+      this.ImageSourceComparator = ImageSourceComparator
+        ? (img) => ImageSourceComparator(img, this.currentFrame)
+        : undefined
     } else {
       this.ImageSourceComparator = ImageSourceComparator
     }
@@ -79,9 +104,9 @@ export class Sprite extends CoreBaseWithoutMouse {
   }
 
   draw() {
-    // if (this.animated) {
-    //   this.frameUpdater()
-    // }
+    if (this.animated) {
+      this.frameUpdater()
+    }
 
     Draw.Image({
       ctx: this.ctx,

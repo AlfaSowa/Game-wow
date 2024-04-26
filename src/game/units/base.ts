@@ -1,4 +1,5 @@
 import { PositionType, TargetType } from '../../engine'
+import { Player } from '../player'
 
 export type UnitBaseConstructor = {
   health: number
@@ -11,6 +12,8 @@ export class UnitBase {
     position: { x: 0, y: 0 },
     radius: 0
   }
+
+  player: Player | null = null
 
   health: number = 0
   currentHealth: number = 0

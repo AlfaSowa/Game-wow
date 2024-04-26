@@ -12,6 +12,7 @@ export type DrawRectangleType = {
   fill?: boolean
 }
 
+//TODO переделать передачу position (смотри проблему в new Bar)
 export const drawRectangle = (args: DrawRectangleType) => {
   const { ctx, position, width, height, color, fill = true } = args
 
@@ -68,13 +69,28 @@ type DrawImageType = {
   sourceImage?: SourceImageType
   width?: number
   height?: number
-  ImageClipComparator?: (img: any) => { sWidth: number; sHeight: number; dWidth: number; dHeight: number }
+  ImageClipComparator?: (img: any) => {
+    sWidth: number
+    sHeight: number
+    dWidth: number
+    dHeight: number
+  }
   ImageSourceComparator?: (img: any) => { sx: number; sy: number }
   isCentered?: boolean
 }
 
 export const drawImage = (args: DrawImageType) => {
-  const { ctx, position, src, sourceImage, width, height, ImageClipComparator, ImageSourceComparator, isCentered } = args
+  const {
+    ctx,
+    position,
+    src,
+    sourceImage,
+    width,
+    height,
+    ImageClipComparator,
+    ImageSourceComparator,
+    isCentered
+  } = args
 
   const img = new Image()
   img.src = src
@@ -95,10 +111,22 @@ export const drawImage = (args: DrawImageType) => {
     }
   }
 
-  const { sWidth, sHeight, dWidth, dHeight } = ImageClipComparator ? ImageClipComparator(img) : setImageClip()
+  const { sWidth, sHeight, dWidth, dHeight } = ImageClipComparator
+    ? ImageClipComparator(img)
+    : setImageClip()
   const { sx, sy } = ImageSourceComparator ? ImageSourceComparator(img) : setImageSource()
 
   if (ctx) {
-    ctx.drawImage(img, sx, sy, sWidth, sHeight, isCentered ? position.x - dWidth / 2 : position.x, isCentered ? position.y - dHeight / 2 : position.y, dWidth, dHeight)
+    ctx.drawImage(
+      img,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      isCentered ? position.x - dWidth / 2 : position.x,
+      isCentered ? position.y - dHeight / 2 : position.y,
+      dWidth,
+      dHeight
+    )
   }
 }

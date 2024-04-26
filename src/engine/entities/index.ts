@@ -1,1 +1,1 @@
-export { BaseEntities } from "./base";
+export { BaseEntities } from './base'

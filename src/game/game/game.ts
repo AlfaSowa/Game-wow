@@ -30,7 +30,11 @@ export class GameCustom implements IGameCustom {
     const game = new Engine.Game({ isCreated: true })
     this.game = game
 
-    const { canvas, context } = game.init({ height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP, width: Math.floor(window.innerWidth / TAILS_GAP) * TAILS_GAP, refComponent })
+    const { canvas, context } = game.init({
+      height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP,
+      width: Math.floor(window.innerWidth / TAILS_GAP) * TAILS_GAP,
+      refComponent
+    })
 
     this.canvas = canvas
     this.ctx = context
@@ -44,7 +48,7 @@ export class GameCustom implements IGameCustom {
     this.player.init()
 
     this.boss = new Boss({ ctx: this.ctx })
-    this.boss.init({ position: this.player.position, radius: 100 })
+    this.boss.init({ target: { position: this.player.position, radius: 100 }, player: this.player })
 
     this.entities.push(this.boss)
 

@@ -1,7 +1,13 @@
 import { Engine } from '..'
 
 export const unitMovement = (build: any, bounds: number = 0) => {
-  if (Engine.Utils.isOnCanavasField({ ctx: build.ctx, radius: build.radius, position: build.position })) {
+  if (
+    Engine.Utils.isOnCanavasField({
+      ctx: build.ctx,
+      radius: build.radius,
+      position: build.position
+    })
+  ) {
     if (build.KeyD) {
       build.position.x += build.vel
     }

@@ -16,6 +16,8 @@ export type PositionType = {
 export type TargetType = {
   position: PositionType
   radius: number
+  affectWithTarget?: (damage: number) => void
+  healWithTarget?: (heal: number) => void
 }
 
 export type MoveMovesKeys = 'KeyW' | 'KeyA' | 'KeyS' | 'KeyD'

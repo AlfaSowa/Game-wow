@@ -21,7 +21,14 @@ export class RangeAttack extends CoreBase {
   targetPosition: PositionType = { x: 0, y: 0 }
   targetRadius: number = 0
 
-  constructor({ mouse, position, spread, ...args }: CoreBaseConstructorType & { mouse: MouseType } & { position: PositionType } & { spread: number }) {
+  constructor({
+    mouse,
+    position,
+    spread,
+    ...args
+  }: CoreBaseConstructorType & { mouse: MouseType } & { position: PositionType } & {
+    spread: number
+  }) {
     super({
       mouse: {
         ...mouse,
@@ -47,11 +54,22 @@ export class RangeAttack extends CoreBase {
     this.position.x -= Math.cos(angle) * 2
     this.position.y -= Math.sin(angle) * 2
 
-    Draw.Circle({ ctx: this.ctx, radius: this.affectRadius, position: this.position, color: this.color })
+    Draw.Circle({
+      ctx: this.ctx,
+      radius: this.affectRadius,
+      position: this.position,
+      color: this.color
+    })
 
     this.ctx.strokeStyle = this.color
     this.ctx.beginPath()
-    this.ctx.arc(this.targetPosition.x, this.targetPosition.y, this.targetRadius, Math.cos(angle), Math.PI + (Math.PI * Math.cos(angle)) / 2)
+    this.ctx.arc(
+      this.targetPosition.x,
+      this.targetPosition.y,
+      this.targetRadius,
+      Math.cos(angle),
+      Math.PI + (Math.PI * Math.cos(angle)) / 2
+    )
     this.ctx.stroke()
 
     Engine.Helpers.delayToCallback('frameElapsed', 'frameHold', this, () => {
@@ -68,7 +86,12 @@ export class RangeAttack extends CoreBase {
 
       let angle = Math.atan2(delta.y, delta.x)
 
-      if (this.position.x > 0 && this.position.x < this.ctx.canvas.width && this.position.y > 0 && this.position.y < this.ctx.canvas.height) {
+      if (
+        this.position.x > 0 &&
+        this.position.x < this.ctx.canvas.width &&
+        this.position.y > 0 &&
+        this.position.y < this.ctx.canvas.height
+      ) {
         this.position.x += Math.cos(angle) * this.vel
         this.position.y += Math.sin(angle) * this.vel
         this.mouse.x += Math.cos(angle) * this.vel
@@ -81,7 +104,12 @@ export class RangeAttack extends CoreBase {
 
   drawProjectile() {
     if (!this.isAffectStart) {
-      Draw.Circle({ ctx: this.ctx, radius: this.radius, position: this.position, color: this.color })
+      Draw.Circle({
+        ctx: this.ctx,
+        radius: this.radius,
+        position: this.position,
+        color: this.color
+      })
       this.moveProjectile()
     }
   }

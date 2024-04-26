@@ -1,1 +1,2 @@
-export { Bar } from "./bar";
+export { Bar } from './bar'
+export { VoidZone } from './void-zone'

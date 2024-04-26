@@ -1,8 +1,26 @@
 import { Game, RangeAttack } from './core'
 import { BaseEntities } from './entities'
 import { Sprite } from './sprite'
-import { delayToCallback, drawCircle, drawImage, drawRectangle, isMouseOnTarget, isOnCanavasField, isTargetsColision, moveElementToTarget, randomNumber, setMousePosition, unitMovement } from './utils'
-export type { MouseType, TargetType, CoreBaseConstructorType, MoveMovesKeys, PositionType } from './types'
+import {
+  delayToCallback,
+  drawCircle,
+  drawImage,
+  drawRectangle,
+  isMouseOnTarget,
+  isOnCanavasField,
+  isTargetsColision,
+  moveElementToTarget,
+  randomNumber,
+  setMousePosition,
+  unitMovement
+} from './utils'
+export type {
+  MouseType,
+  TargetType,
+  CoreBaseConstructorType,
+  MoveMovesKeys,
+  PositionType
+} from './types'
 
 export const Draw = {
   Circle: drawCircle,

@@ -1,2 +1,2 @@
-export * from "./canvas-pool";
-export * from "./create-render";
+export * from './canvas-pool'
+export * from './create-render'

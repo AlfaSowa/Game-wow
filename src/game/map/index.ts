@@ -1,1 +1,1 @@
-export { TailsetMap } from "./map";
+export { TailsetMap } from './map'

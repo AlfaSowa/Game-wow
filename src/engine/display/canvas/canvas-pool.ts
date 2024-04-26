@@ -1,7 +1,12 @@
 import { CanvasPoolCreate, CanvasPoolCreateReturn } from './types'
 
 export class CanvasPool {
-  create({ parent, width = 1, height = 1, refComponent }: CanvasPoolCreate): CanvasPoolCreateReturn {
+  create({
+    parent,
+    width = 1,
+    height = 1,
+    refComponent
+  }: CanvasPoolCreate): CanvasPoolCreateReturn {
     let canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height

@@ -2,16 +2,16 @@
 //   /* ... */
 // }
 
-export const mixin = (superclass: any) => new MixinBuilder(superclass);
+export const mixin = (superclass: any) => new MixinBuilder(superclass)
 
 class MixinBuilder {
-  superclass: [];
+  superclass: []
 
   constructor(superclass: any) {
-    this.superclass = superclass;
+    this.superclass = superclass
   }
 
   with(...mixins: any[]) {
-    return mixins.reduce((c, mixin) => mixin(c), this.superclass);
+    return mixins.reduce((c, mixin) => mixin(c), this.superclass)
   }
 }

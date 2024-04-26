@@ -30,7 +30,10 @@ export const App = () => {
   return (
     <>
       {!game && <GameComponent starGame={starGame} stopGame={stopGame} pauseGame={pauseGame} />}
-      <div className="h-screen w-screen flex items-center justify-center bg-green-200" ref={canvasRef} />
+      <div
+        className="h-screen w-screen flex items-center justify-center bg-green-200"
+        ref={canvasRef}
+      />
     </>
   )
 }
