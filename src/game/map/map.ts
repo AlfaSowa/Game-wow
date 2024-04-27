@@ -46,45 +46,55 @@ export class TailsetMap {
   }
 
   init() {
-    this.tails = TAILS.map((row, rowIdx) => {
-      return row.split('-').map((tail, TailIdx) => {
-        return new Sprite({
-          ctx: this.ctx,
-          src: TailsetImg,
-          position: {
-            x: TailIdx * this.tailsGap,
-            y: rowIdx * this.tailsGap
-          },
-          animated: false,
-          ImageClipComparator: (img) => {
-            return {
-              sWidth: img.width / AMOUNT_COLS,
-              sHeight: img.height / AMOUNT_ROWS,
-              dWidth: img.width / AMOUNT_COLS,
-              dHeight: img.height / AMOUNT_ROWS
-            }
-          },
-          ImageSourceComparator: (img) => {
-            return {
-              sx: (Number(tail) % TAIL_SIZE) * this.tailSize,
-              sy: Math.floor(Number(tail) / TAIL_SIZE) * this.tailSize
-            }
-          }
-        })
-      })
-    })
+    // this.tails = TAILS.map((row, rowIdx) => {
+    //   return row.split('-').map((tail, TailIdx) => {
+    //     return new Sprite({
+    //       ctx: this.ctx,
+    //       src: TailsetImg,
+    //       position: {
+    //         x: TailIdx * this.tailsGap,
+    //         y: rowIdx * this.tailsGap
+    //       },
+    //       animated: false,
+    //       ImageClipComparator: (img) => {
+    //         return {
+    //           sWidth: img.width / AMOUNT_COLS,
+    //           sHeight: img.height / AMOUNT_ROWS,
+    //           dWidth: img.width / AMOUNT_COLS,
+    //           dHeight: img.height / AMOUNT_ROWS
+    //         }
+    //       },
+    //       ImageSourceComparator: (img) => {
+    //         return {
+    //           sx: (Number(tail) % TAIL_SIZE) * this.tailSize,
+    //           sy: Math.floor(Number(tail) / TAIL_SIZE) * this.tailSize
+    //         }
+    //       }
+    //     })
+    //   })
+    // })
 
-    for (let i = 0; i < this.tails.length; i++) {
-      for (let j = 0; j < this.tails[i].length; j++) {
-        this.tails[i][j].draw()
+    const img = new Image()
+    img.src = TailsetImg
+
+    img.onload = () => {
+      for (let i = 0; i < TAILS.length; i++) {
+        const row = TAILS[i].split('-')
+        for (let j = 0; j < row.length; j++) {
+          this.ctx.drawImage(
+            img,
+            (Number(row[j]) % TAIL_SIZE) * this.tailSize,
+            Math.floor(Number(row[j]) / TAIL_SIZE) * this.tailSize,
+            img.width / AMOUNT_COLS,
+            img.height / AMOUNT_ROWS,
+            j * this.tailsGap,
+            i * this.tailsGap,
+            img.width / AMOUNT_COLS,
+            img.height / AMOUNT_ROWS
+          )
+        }
       }
     }
-
-    // for (let i = 0; i < this.amountHeight; i++) {
-    //   for (let j = 0; j < this.amountWidth; j++) {
-    //     this.getTail(i, j)
-    //   }
-    // }
   }
 
   getTail(i: number, j: number) {
@@ -114,6 +124,8 @@ export class TailsetMap {
   }
 
   draw() {
+    console.log(12)
+
     if (this.isDynamic) {
       Engine.Helpers.delayToCallback('redrawMapElapsed', 'redrawMapHold', this, () => {
         for (let i = 0; i < this.amountHeight; i++) {

@@ -122,18 +122,16 @@ export const drawImage = (args: DrawImageType) => {
   const { sx, sy } = ImageSourceComparator ? ImageSourceComparator(img) : setImageSource()
 
   if (ctx) {
-    img.onload = function () {
-      ctx.drawImage(
-        img,
-        sx,
-        sy,
-        sWidth,
-        sHeight,
-        isCentered ? position.x - dWidth / 2 : position.x,
-        isCentered ? position.y - dHeight / 2 : position.y,
-        dWidth,
-        dHeight
-      )
-    }
+    ctx.drawImage(
+      img,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      isCentered ? position.x - dWidth / 2 : position.x,
+      isCentered ? position.y - dHeight / 2 : position.y,
+      dWidth,
+      dHeight
+    )
   }
 }

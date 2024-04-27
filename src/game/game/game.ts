@@ -86,14 +86,14 @@ export class GameCustom implements IGameCustom {
   }
 
   draw() {
-    if (this.tailset) {
-      this.tailset.draw()
+    // if (this.tailset) {
+    //   this.tailset.draw()
+    // }
+    if (this.boss) {
+      this.boss.draw()
     }
-    // if (this.boss) {
-    //   this.boss.draw()
-    // }
-    // if (this.player) {
-    //   this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
-    // }
+    if (this.player) {
+      this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
+    }
   }
 }
