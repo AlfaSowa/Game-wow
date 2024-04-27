@@ -14,6 +14,7 @@ export type VoidZoneConstructorType = CoreBaseConstructorType & {
   isInstant?: boolean
   isReadyHold?: number
   color?: string
+  isSucking?: boolean
 }
 
 interface IVoidZone {
@@ -36,6 +37,8 @@ interface IVoidZone {
   isReadyHold: number
 
   color: string
+
+  isSucking: boolean
 }
 
 export class VoidZone implements IVoidZone {
@@ -59,6 +62,9 @@ export class VoidZone implements IVoidZone {
 
   isInstant = true
 
+  isExists = true
+  isSucking = true
+
   color: string = '#8805A8'
 
   constructor({
@@ -72,7 +78,8 @@ export class VoidZone implements IVoidZone {
     isInstant,
     isReadyHold,
     color,
-    heal
+    heal,
+    isSucking
   }: VoidZoneConstructorType) {
     this.ctx = ctx
     this.position = position
@@ -85,6 +92,7 @@ export class VoidZone implements IVoidZone {
     this.isInstant = isInstant ?? this.isInstant
     this.isReadyHold = isReadyHold ?? this.isReadyHold
     this.color = color ?? this.color
+    this.isSucking = isSucking ?? this.isSucking
   }
 
   territoryExpansion() {
@@ -118,7 +126,15 @@ export class VoidZone implements IVoidZone {
       if (this.damage && target.affectWithTarget) {
         target.affectWithTarget(this.damage)
       }
-      if (this.heal && target.healWithTarget) {
+
+      if (this.heal && target.healWithTarget && this.radius > 0) {
+        if (this.isSucking) {
+          this.radius -= 1
+          if (this.radius < 10) {
+            this.isExists = false
+          }
+        }
+
         target.healWithTarget(this.heal)
       }
     }

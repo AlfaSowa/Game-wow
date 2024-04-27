@@ -6,16 +6,14 @@ export class Game {
   context: CanvasRenderingContext2D | null = null
   animationFrameId: number | null = null
   isCreated: boolean = false
-  isClearRect: boolean = true
 
-  constructor({ isCreated, isClearRect = true }: { isCreated: boolean; isClearRect?: boolean }) {
+  constructor({ isCreated }: { isCreated: boolean }) {
     this.isCreated = isCreated
-    this.isClearRect = isClearRect
   }
 
-  init({ height, width, refComponent }: GameInit): GameInitReturn {
+  init({ height, width, refComponent, alpha }: GameInit): GameInitReturn {
     const createRender = new CreateRender({ game: this })
-    const { canvas, context } = createRender.create({ height, width, refComponent })
+    const { canvas, context } = createRender.create({ height, width, refComponent, alpha })
     this.canvas = canvas
     this.context = context
 
@@ -24,12 +22,17 @@ export class Game {
 
   start(draw: any) {
     const render = () => {
-      if (this.context && this.isClearRect) {
+      if (this.context) {
+        this.context.save()
+        this.context.setTransform(1, 0, 0, 1, 0, 0)
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height)
+        this.context.restore()
       }
+
       if (draw) {
         draw()
       }
+
       this.animationFrameId = window.requestAnimationFrame(render)
     }
 

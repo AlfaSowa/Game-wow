@@ -5,6 +5,7 @@ export type CanvasPoolCreate = {
   width: number
   height: number
   refComponent?: any
+  alpha?: boolean
 }
 export type CanvasPoolCreateReturn = {
   canvas: HTMLCanvasElement
@@ -18,4 +19,5 @@ export type CreateRenderCreate = {
   width: number
   height: number
   refComponent?: any
+  alpha?: boolean
 }

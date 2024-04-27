@@ -5,7 +5,6 @@ import testNPCImage from '../assets/NPC-Merchant-interaction-entry.png'
 import { Boss } from '../enemies'
 import { RangeAttack } from '../../engine/core'
 import { Bar, VoidZone } from '../entities'
-import { log } from 'console'
 
 type EntitiesType = { entities: Boss[] }
 type DrawPlayerProps = EntitiesType & { bounds?: number }
@@ -61,6 +60,7 @@ export class Player extends UnitBase {
       width: 400,
       position: { x: args.ctx.canvas.width / 2 - 200, y: args.ctx.canvas.height - 42 }
     })
+
     this.dashBar = new Bar({
       ctx: this.ctx,
       color: '#9E9E9E',
@@ -275,6 +275,10 @@ export class Player extends UnitBase {
 
     if (this.healZone) {
       this.healZone.draw(this)
+
+      if (!this.healZone.isExists) {
+        this.healZone = null
+      }
     }
 
     this.affectWithCollision(entities)

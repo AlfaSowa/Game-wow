@@ -36,11 +36,19 @@ export const unitMovement = (build: any, bounds: number = 0) => {
   }
 }
 
-export const delayToCallback = (elapsed: string, hold: string, bild: any, callback: () => any) => {
+export const delayToCallback = (elapsed: string, hold: string, bild: any, callback: () => any, isPreload?: string) => {
   bild[elapsed]++
+
+  if (isPreload && bild[isPreload]) {
+    callback()
+  }
 
   if (bild[elapsed] % bild[hold] === 0) {
     bild[elapsed] = 0
     callback()
+
+    if (isPreload && bild[isPreload]) {
+      bild[isPreload] = false
+    }
   }
 }

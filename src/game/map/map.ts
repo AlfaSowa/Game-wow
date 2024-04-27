@@ -2,15 +2,17 @@ import { Sprite } from '../../engine/sprite'
 
 import TailsetImg from '../assets/tileset_version1.1.png'
 import { TAILS } from './const'
-import { CoreBaseConstructorType, Draw } from '../../engine'
+import { CoreBaseConstructorType, Draw, Engine } from '../../engine'
 
 type TailsetMapConstructorType = CoreBaseConstructorType & {
   tailSize: number
   tailsGap: number
 }
 
-const TAIL_SIZE_X = 16
-const TAIL_SIZE_Y = 11
+const TAIL_SIZE = 16
+
+const AMOUNT_COLS = 16
+const AMOUNT_ROWS = 11
 
 export class TailsetMap {
   ctx: CanvasRenderingContext2D
@@ -18,8 +20,9 @@ export class TailsetMap {
   tmp: any[][] = []
   img = new Image()
 
-  frameElapsed: number = 0
-  frameHold: number = 1000
+  redrawMapElapsed: number = 0
+  redrawMapHold: number = 1000
+  redrawMapPreload: boolean = true
 
   amountWidth = 0
   amountHeight = 0
@@ -27,7 +30,9 @@ export class TailsetMap {
   tailSize = 0
   tailsGap = 0
 
-  simpleTiles: boolean = true
+  simpleTiles: boolean = false
+
+  isDynamic: boolean = false
 
   constructor({ ctx, tailSize, tailsGap }: TailsetMapConstructorType) {
     this.ctx = ctx
@@ -42,9 +47,7 @@ export class TailsetMap {
 
   init() {
     this.tails = TAILS.map((row, rowIdx) => {
-      return row.map((tail, TailIdx) => {
-        const params = tail.split('-')
-
+      return row.split('-').map((tail, TailIdx) => {
         return new Sprite({
           ctx: this.ctx,
           src: TailsetImg,
@@ -55,21 +58,33 @@ export class TailsetMap {
           animated: false,
           ImageClipComparator: (img) => {
             return {
-              sWidth: img.width / TAIL_SIZE_X,
-              sHeight: img.height / TAIL_SIZE_Y,
-              dWidth: img.width / TAIL_SIZE_X,
-              dHeight: img.height / TAIL_SIZE_Y
+              sWidth: img.width / AMOUNT_COLS,
+              sHeight: img.height / AMOUNT_ROWS,
+              dWidth: img.width / AMOUNT_COLS,
+              dHeight: img.height / AMOUNT_ROWS
             }
           },
           ImageSourceComparator: (img) => {
             return {
-              sx: (img.width / TAIL_SIZE_X) * Number(params[0]),
-              sy: (img.height / TAIL_SIZE_Y) * Number(params[1])
+              sx: (Number(tail) % TAIL_SIZE) * this.tailSize,
+              sy: Math.floor(Number(tail) / TAIL_SIZE) * this.tailSize
             }
           }
         })
       })
     })
+
+    for (let i = 0; i < this.tails.length; i++) {
+      for (let j = 0; j < this.tails[i].length; j++) {
+        this.tails[i][j].draw()
+      }
+    }
+
+    // for (let i = 0; i < this.amountHeight; i++) {
+    //   for (let j = 0; j < this.amountWidth; j++) {
+    //     this.getTail(i, j)
+    //   }
+    // }
   }
 
   getTail(i: number, j: number) {
@@ -99,10 +114,22 @@ export class TailsetMap {
   }
 
   draw() {
-    for (let i = 0; i < this.amountHeight; i++) {
-      for (let j = 0; j < this.amountWidth; j++) {
-        this.getTail(i, j)
-      }
+    if (this.isDynamic) {
+      Engine.Helpers.delayToCallback('redrawMapElapsed', 'redrawMapHold', this, () => {
+        for (let i = 0; i < this.amountHeight; i++) {
+          for (let j = 0; j < this.amountWidth; j++) {
+            this.getTail(i, j)
+          }
+        }
+      })
+    } else {
+      Engine.Helpers.delayToCallback('redrawMapElapsed', 'redrawMapHold', this, () => {
+        for (let i = 0; i < this.tails.length; i++) {
+          for (let j = 0; j < this.tails[i].length; j++) {
+            this.tails[i][j].draw()
+          }
+        }
+      })
     }
   }
 }

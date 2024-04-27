@@ -17,15 +17,23 @@ export const drawRectangle = (args: DrawRectangleType) => {
   const { ctx, position, width, height, color, fill = true } = args
 
   if (ctx) {
-    ctx.fillStyle = color || '#f5f7'
-    ctx.strokeStyle = color || '#f5f7'
+    ctx.save()
+
     ctx.beginPath()
-    ctx.fillRect(position.x, position.y, width, height)
+
+    ctx.rect(position.x, position.y, width, height)
+
     if (fill) {
+      ctx.fillStyle = color || '#f5f7'
       ctx.fill()
     } else {
+      ctx.strokeStyle = color || '#f5f7'
       ctx.stroke()
     }
+
+    ctx.closePath()
+
+    ctx.restore()
   }
 }
 
@@ -42,15 +50,23 @@ export const drawCircle = (args: DrawCircleType) => {
   const { ctx, radius, position, color, fill = true } = args
 
   if (ctx) {
-    ctx.fillStyle = color || '#f5f7'
-    ctx.strokeStyle = color || '#f5f7'
+    ctx.save()
+
     ctx.beginPath()
+
     ctx.arc(position.x, position.y, radius, 0, PI2)
+
     if (fill) {
+      ctx.fillStyle = color || '#f5f7'
       ctx.fill()
     } else {
+      ctx.strokeStyle = color || '#f5f7'
       ctx.stroke()
     }
+
+    ctx.closePath()
+
+    ctx.restore()
   }
 }
 
@@ -80,17 +96,8 @@ type DrawImageType = {
 }
 
 export const drawImage = (args: DrawImageType) => {
-  const {
-    ctx,
-    position,
-    src,
-    sourceImage,
-    width,
-    height,
-    ImageClipComparator,
-    ImageSourceComparator,
-    isCentered
-  } = args
+  const { ctx, position, src, sourceImage, width, height, ImageClipComparator, ImageSourceComparator, isCentered } =
+    args
 
   const img = new Image()
   img.src = src
@@ -111,22 +118,22 @@ export const drawImage = (args: DrawImageType) => {
     }
   }
 
-  const { sWidth, sHeight, dWidth, dHeight } = ImageClipComparator
-    ? ImageClipComparator(img)
-    : setImageClip()
+  const { sWidth, sHeight, dWidth, dHeight } = ImageClipComparator ? ImageClipComparator(img) : setImageClip()
   const { sx, sy } = ImageSourceComparator ? ImageSourceComparator(img) : setImageSource()
 
   if (ctx) {
-    ctx.drawImage(
-      img,
-      sx,
-      sy,
-      sWidth,
-      sHeight,
-      isCentered ? position.x - dWidth / 2 : position.x,
-      isCentered ? position.y - dHeight / 2 : position.y,
-      dWidth,
-      dHeight
-    )
+    img.onload = function () {
+      ctx.drawImage(
+        img,
+        sx,
+        sy,
+        sWidth,
+        sHeight,
+        isCentered ? position.x - dWidth / 2 : position.x,
+        isCentered ? position.y - dHeight / 2 : position.y,
+        dWidth,
+        dHeight
+      )
+    }
   }
 }

@@ -8,8 +8,8 @@ export class CreateRender {
     this.game = game
   }
 
-  create({ height, width, refComponent }: CreateRenderCreate) {
+  create({ height, width, refComponent, alpha }: CreateRenderCreate) {
     const canvasPool = new CanvasPool()
-    return canvasPool.create({ parent: this.game, height, width, refComponent })
+    return canvasPool.create({ parent: this.game, height, width, refComponent, alpha })
   }
 }

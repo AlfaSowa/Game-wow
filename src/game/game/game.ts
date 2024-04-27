@@ -5,11 +5,14 @@ import { Player } from '../player'
 import { IGameCustom } from './model'
 
 const TAIL_SIZE = 32
-const TAILS_GAP = TAIL_SIZE
+const TAILS_GAP = TAIL_SIZE + 1
 
 export class GameCustom implements IGameCustom {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
+
+  canvasBg: HTMLCanvasElement
+  ctxBg: CanvasRenderingContext2D
 
   player: Player | null = null
   boss: Boss | null = null
@@ -25,10 +28,21 @@ export class GameCustom implements IGameCustom {
   }
 
   game: any = null
+  gameBg: any = null
 
   constructor(refComponent?: HTMLDivElement | null) {
     const game = new Engine.Game({ isCreated: true })
     this.game = game
+
+    const { canvas: canvasBg, context: contextBg } = game.init({
+      height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP,
+      width: Math.floor(window.innerWidth / TAILS_GAP) * TAILS_GAP,
+      refComponent,
+      alpha: false
+    })
+
+    this.canvasBg = canvasBg
+    this.ctxBg = contextBg
 
     const { canvas, context } = game.init({
       height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP,
@@ -41,7 +55,7 @@ export class GameCustom implements IGameCustom {
   }
 
   init() {
-    this.tailset = new TailsetMap({ ctx: this.ctx, tailsGap: TAILS_GAP, tailSize: TAIL_SIZE })
+    this.tailset = new TailsetMap({ ctx: this.ctxBg, tailsGap: TAILS_GAP, tailSize: TAIL_SIZE })
     this.tailset.init()
 
     this.player = new Player({ ctx: this.ctx, mouse: this.mouse })
@@ -75,13 +89,11 @@ export class GameCustom implements IGameCustom {
     if (this.tailset) {
       this.tailset.draw()
     }
-
-    if (this.boss) {
-      this.boss.draw()
-    }
-
-    if (this.player) {
-      this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
-    }
+    // if (this.boss) {
+    //   this.boss.draw()
+    // }
+    // if (this.player) {
+    //   this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
+    // }
   }
 }
