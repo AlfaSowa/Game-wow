@@ -1,11 +1,11 @@
 import { TargetType } from '../../engine'
-import { Player } from '../player'
+import { PlayerBase } from '../player'
 import { UnitBase } from '../units'
 
 export class EnemyBase extends UnitBase {
   radius = 100
 
-  init({ target, player }: { target: TargetType; player: Player }) {
+  init({ target, player }: { target: TargetType; player: PlayerBase }) {
     super.init()
     this.target = target
     this.player = player

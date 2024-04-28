@@ -1,7 +1,6 @@
 import { Game } from '../../core'
 
 export type CanvasPoolCreate = {
-  parent: any
   width: number
   height: number
   refComponent?: any
@@ -9,7 +8,7 @@ export type CanvasPoolCreate = {
 }
 export type CanvasPoolCreateReturn = {
   canvas: HTMLCanvasElement
-  context: CanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D
 }
 
 export type CreateRenderConstructor = {

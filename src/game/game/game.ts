@@ -1,20 +1,17 @@
 import { Engine, MouseType } from '../../engine'
 import { Boss } from '../enemies'
 import { TailsetMap } from '../map'
-import { Player } from '../player'
+import { PlayerBase, PlayerMag } from '../player'
 import { IGameCustom } from './model'
 
 const TAIL_SIZE = 32
-const TAILS_GAP = TAIL_SIZE + 1
+const TAILS_GAP = TAIL_SIZE
 
 export class GameCustom implements IGameCustom {
-  canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
-
-  canvasBg: HTMLCanvasElement
   ctxBg: CanvasRenderingContext2D
 
-  player: Player | null = null
+  player: PlayerBase | null = null
   boss: Boss | null = null
 
   entities: Boss[] = []
@@ -34,39 +31,37 @@ export class GameCustom implements IGameCustom {
     const game = new Engine.Game({ isCreated: true })
     this.game = game
 
-    const { canvas: canvasBg, context: contextBg } = game.init({
+    const { ctx: contextBg } = game.init({
       height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP,
       width: Math.floor(window.innerWidth / TAILS_GAP) * TAILS_GAP,
       refComponent,
       alpha: false
     })
 
-    this.canvasBg = canvasBg
     this.ctxBg = contextBg
 
-    const { canvas, context } = game.init({
+    const { ctx } = game.init({
       height: Math.floor(window.innerHeight / TAILS_GAP) * TAILS_GAP,
       width: Math.floor(window.innerWidth / TAILS_GAP) * TAILS_GAP,
       refComponent
     })
 
-    this.canvas = canvas
-    this.ctx = context
+    this.ctx = ctx
   }
 
   init() {
     this.tailset = new TailsetMap({ ctx: this.ctxBg, tailsGap: TAILS_GAP, tailSize: TAIL_SIZE })
     this.tailset.init()
 
-    this.player = new Player({ ctx: this.ctx, mouse: this.mouse })
+    this.player = new PlayerMag({ ctx: this.ctx, mouse: this.mouse, tailSize: TAIL_SIZE })
     this.player.init()
 
-    this.boss = new Boss({ ctx: this.ctx })
-    this.boss.init({ target: { position: this.player.position, radius: 100 }, player: this.player })
+    // this.boss = new Boss({ ctx: this.ctx })
+    // this.boss.init({ target: { position: this.player.position, radius: 100 }, player: this.player })
 
-    this.entities.push(this.boss)
+    // this.entities.push(this.boss)
 
-    this.canvas.addEventListener('mousemove', (e) => Engine.Utils.setMousePosition(this, e))
+    this.ctx.canvas.addEventListener('mousemove', (e) => Engine.Utils.setMousePosition(this, e))
   }
 
   start() {
@@ -86,12 +81,9 @@ export class GameCustom implements IGameCustom {
   }
 
   draw() {
-    // if (this.tailset) {
-    //   this.tailset.draw()
+    // if (this.boss) {
+    //   this.boss.draw()
     // }
-    if (this.boss) {
-      this.boss.draw()
-    }
     if (this.player) {
       this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
     }

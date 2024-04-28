@@ -2,6 +2,7 @@ import { Game, RangeAttack } from './core'
 import { BaseEntities } from './entities'
 import { Sprite } from './sprite'
 import {
+  IsTargetsRectColision,
   delayToCallback,
   drawCircle,
   drawImage,
@@ -14,13 +15,7 @@ import {
   setMousePosition,
   unitMovement
 } from './utils'
-export type {
-  MouseType,
-  TargetType,
-  CoreBaseConstructorType,
-  MoveMovesKeys,
-  PositionType
-} from './types'
+export type { MouseType, TargetType, CoreBaseConstructorType, MoveMovesKeys, PositionType } from './types'
 
 export const Draw = {
   Circle: drawCircle,
@@ -38,6 +33,7 @@ export const Engine = {
   Utils: {
     isOnCanavasField: isOnCanavasField,
     isTargetsColision: isTargetsColision,
+    IsTargetsRectColision: IsTargetsRectColision,
     isMouseOnTarget: isMouseOnTarget,
     moveElementToTarget: moveElementToTarget,
     setMousePosition: setMousePosition,

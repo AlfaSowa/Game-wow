@@ -22,18 +22,34 @@ type IsTargetsColisionType = {
   positionTargetB: TargetType
 }
 export const isTargetsColision = ({
-  positionTargetA,
-  positionTargetB
+  positionTargetA: targetA,
+  positionTargetB: targetB
 }: IsTargetsColisionType): boolean => {
   let delta = {
-    x: positionTargetA.position.x - positionTargetB.position.x,
-    y: positionTargetA.position.y - positionTargetB.position.y
+    x: targetA.position.x - targetB.position.x,
+    y: targetA.position.y - targetB.position.y
   }
-  let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
 
-  if (dist < positionTargetA.radius + positionTargetB.radius) {
+  return Math.sqrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2)) < targetA.radius + targetB.radius
+}
+
+//--isTargetsRectColision--//
+type TargetSizeType = { width: number; height: number }
+
+type IsTargetsRectColisionType = {
+  targetA: TargetType & TargetSizeType
+  targetB: TargetType & TargetSizeType
+}
+export const IsTargetsRectColision = ({ targetA, targetB }: IsTargetsRectColisionType): boolean => {
+  if (
+    targetA.position.x + targetA.width >= targetB.position.x &&
+    targetA.position.x <= targetB.position.x + targetB.width &&
+    targetA.position.y + targetA.height >= targetB.position.y &&
+    targetA.position.y <= targetB.position.y + targetB.height
+  ) {
     return true
   }
+
   return false
 }
 
@@ -89,5 +105,5 @@ export const setMousePosition = (bild: any, { offsetX, offsetY }: MouseEvent) =>
 
 //--randomNumber--//
 export const randomNumber = (max: number, min: number): number => {
-  return Math.random() * (max - min) + min
+  return Math.round(Math.random() * (max - min) + min)
 }

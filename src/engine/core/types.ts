@@ -6,6 +6,5 @@ export type GameInit = {
 }
 
 export type GameInitReturn = {
-  canvas: HTMLCanvasElement
-  context: CanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D
 }

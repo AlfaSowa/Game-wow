@@ -1,7 +1,7 @@
 import { Sprite } from '../../engine/sprite'
 
 import TailsetImg from '../assets/tileset_version1.1.png'
-import { TAILS } from './const'
+import { getMatrixOfTails } from './const'
 import { CoreBaseConstructorType, Draw, Engine } from '../../engine'
 
 type TailsetMapConstructorType = CoreBaseConstructorType & {
@@ -46,40 +46,27 @@ export class TailsetMap {
   }
 
   init() {
-    // this.tails = TAILS.map((row, rowIdx) => {
-    //   return row.split('-').map((tail, TailIdx) => {
-    //     return new Sprite({
-    //       ctx: this.ctx,
-    //       src: TailsetImg,
-    //       position: {
-    //         x: TailIdx * this.tailsGap,
-    //         y: rowIdx * this.tailsGap
-    //       },
-    //       animated: false,
-    //       ImageClipComparator: (img) => {
-    //         return {
-    //           sWidth: img.width / AMOUNT_COLS,
-    //           sHeight: img.height / AMOUNT_ROWS,
-    //           dWidth: img.width / AMOUNT_COLS,
-    //           dHeight: img.height / AMOUNT_ROWS
-    //         }
-    //       },
-    //       ImageSourceComparator: (img) => {
-    //         return {
-    //           sx: (Number(tail) % TAIL_SIZE) * this.tailSize,
-    //           sy: Math.floor(Number(tail) / TAIL_SIZE) * this.tailSize
-    //         }
-    //       }
-    //     })
-    //   })
-    // })
-
     const img = new Image()
     img.src = TailsetImg
 
+    const tails = getMatrixOfTails(this.amountWidth - 2, this.amountHeight)
+
     img.onload = () => {
-      for (let i = 0; i < TAILS.length; i++) {
-        const row = TAILS[i].split('-')
+      for (let i = 0; i < tails.length; i++) {
+        const row = tails[i].split('-').reduce((acc: string[], cur: string) => {
+          if (cur.includes('x')) {
+            const values = cur.split('x')
+
+            const arr = [...new Array(Number(values[1]))].fill(values[0])
+
+            acc.push(...arr)
+          } else {
+            acc.push(cur)
+          }
+
+          return acc
+        }, [])
+
         for (let j = 0; j < row.length; j++) {
           this.ctx.drawImage(
             img,
@@ -124,8 +111,6 @@ export class TailsetMap {
   }
 
   draw() {
-    console.log(12)
-
     if (this.isDynamic) {
       Engine.Helpers.delayToCallback('redrawMapElapsed', 'redrawMapHold', this, () => {
         for (let i = 0; i < this.amountHeight; i++) {

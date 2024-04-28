@@ -1,9 +1,9 @@
-import { CreateRender } from '../display'
+import { CanvasPool } from '../display'
 import { GameInit, GameInitReturn } from './types'
 
 export class Game {
   canvas: HTMLCanvasElement | null = null
-  context: CanvasRenderingContext2D | null = null
+  ctx: CanvasRenderingContext2D | null = null
   animationFrameId: number | null = null
   isCreated: boolean = false
 
@@ -12,21 +12,22 @@ export class Game {
   }
 
   init({ height, width, refComponent, alpha }: GameInit): GameInitReturn {
-    const createRender = new CreateRender({ game: this })
-    const { canvas, context } = createRender.create({ height, width, refComponent, alpha })
-    this.canvas = canvas
-    this.context = context
+    const canvasPool = new CanvasPool()
+    const { canvas, ctx } = canvasPool.create({ height, width, refComponent, alpha })
 
-    return { canvas, context }
+    this.canvas = canvas
+    this.ctx = ctx
+
+    return { ctx }
   }
 
   start(draw: any) {
     const render = () => {
-      if (this.context) {
-        this.context.save()
-        this.context.setTransform(1, 0, 0, 1, 0, 0)
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height)
-        this.context.restore()
+      if (this.ctx) {
+        this.ctx.save()
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0)
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+        this.ctx.restore()
       }
 
       if (draw) {

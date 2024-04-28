@@ -16,6 +16,8 @@ export type PositionType = {
 export type TargetType = {
   position: PositionType
   radius: number
+  width?: number
+  height?: number
   affectWithTarget?: (damage: number) => void
   healWithTarget?: (heal: number) => void
 }

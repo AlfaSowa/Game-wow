@@ -1,16 +1,16 @@
 import { Sprite } from '../../engine/sprite'
-import { Bar, VoidZone } from '../entities'
+import { Bar, FireVoidZone } from '../entities'
 import { EnemyBase } from './base'
 import bossIdleImg from '../assets/ghost-idle.png'
 import { CoreBaseConstructorType, Draw, Engine, TargetType } from '../../engine'
-import { Player } from '../player'
+import { PlayerBase } from '../player'
 
 export class Boss extends EnemyBase {
   healthBar: Bar
   sprite: Sprite | null = null
   damageOnCollision: number = 1
 
-  voidZones: VoidZone[] = []
+  fireVoidZones: FireVoidZone[] = []
   voidZoneElapse: number = 0
   voidZoneHold: number = 1000
 
@@ -19,7 +19,7 @@ export class Boss extends EnemyBase {
     this.healthBar = new Bar({ ctx: this.ctx })
   }
 
-  init({ target, player }: { target: TargetType; player: Player }) {
+  init({ target, player }: { target: TargetType; player: PlayerBase }) {
     super.init({ target, player })
 
     this.sprite = new Sprite({
@@ -46,19 +46,12 @@ export class Boss extends EnemyBase {
     })
   }
 
-  createVoidZone() {
+  createFireVoidZones() {
     Engine.Helpers.delayToCallback('voidZoneElapse', 'voidZoneHold', this, () => {
-      this.voidZones.push(
-        new VoidZone({
+      this.fireVoidZones.push(
+        new FireVoidZone({
           ctx: this.ctx,
-          position: { x: this.target.position.x, y: this.target.position.y },
-          damage: 0.5,
-          radius: 100,
-          isInstant: false,
-          isExpansion: true,
-          maxRadius: 200,
-          expansionHold: 3,
-          isReadyHold: 200
+          position: { x: this.target.position.x, y: this.target.position.y }
         })
       )
     })
@@ -72,16 +65,16 @@ export class Boss extends EnemyBase {
   }
 
   //TODO подумать как не передавать player
-  drawVoidZones() {
-    if (this.player) {
-      for (let i = 0; i < this.voidZones.length; i++) {
-        this.voidZones[i].draw({
-          position: this.player.position,
-          radius: this.player.radius,
-          affectWithTarget: this.player.affectWithTarget.bind(this.player)
-        })
-      }
-    }
+  drawFireVoidZones() {
+    // if (this.player) {
+    //   for (let i = 0; i < this.fireVoidZones.length; i++) {
+    //     this.fireVoidZones[i].draw({
+    //       position: this.player.position,
+    //       radius: this.player.radius,
+    //       affectWithTarget: this.player.affectWithTarget.bind(this.player)
+    //     })
+    //   }
+    // }
   }
 
   private shape() {
@@ -104,8 +97,8 @@ export class Boss extends EnemyBase {
 
   draw() {
     super.draw()
-    this.createVoidZone()
-    this.drawVoidZones()
+    this.createFireVoidZones()
+    this.drawFireVoidZones()
     this.shape()
     this.drawHealthBar()
   }

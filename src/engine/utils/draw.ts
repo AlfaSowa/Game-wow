@@ -23,6 +23,8 @@ export const drawRectangle = (args: DrawRectangleType) => {
 
     ctx.rect(position.x, position.y, width, height)
 
+    ctx.lineWidth = 4
+
     if (fill) {
       ctx.fillStyle = color || '#f5f7'
       ctx.fill()

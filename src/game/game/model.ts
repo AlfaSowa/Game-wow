@@ -1,17 +1,16 @@
 import { MouseType } from '../../engine'
 import { Boss } from '../enemies'
 import { TailsetMap } from '../map'
-import { Player } from '../player'
+import { PlayerBase } from '../player'
 
 export interface IGameCustom {
-  canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
 
   game: any
 
   tailset: TailsetMap | null
 
-  player: Player | null
+  player: PlayerBase | null
   boss: Boss | null
 
   entities: Boss[]

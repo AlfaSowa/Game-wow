@@ -1,6 +1,7 @@
 import { CoreBaseConstructorType, Draw, TargetType } from '../../engine'
 import { Bar } from '../entities'
-import { Player } from '../player'
+import {} from '../player'
+import { PlayerBase } from '../player/base'
 import { EnemyBase } from './base'
 
 const WIDTH_HP_BAR = 100
@@ -16,7 +17,7 @@ export class Additional extends EnemyBase {
     this.radius = 40
   }
 
-  init({ target, player }: { target: TargetType; player: Player }) {
+  init({ target, player }: { target: TargetType; player: PlayerBase }) {
     super.init({ player, target })
     this.hpBar = new Bar({
       ctx: this.ctx,

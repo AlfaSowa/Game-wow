@@ -1,4 +1,4 @@
-import { CoreBaseConstructorType, Draw, Engine, PositionType, TargetType } from '../../engine'
+import { CoreBaseConstructorType, Draw, Engine, PositionType, TargetType } from '../../../engine'
 
 export const PI2: number = 2 * Math.PI
 
@@ -6,14 +6,11 @@ export type VoidZoneConstructorType = CoreBaseConstructorType & {
   position: PositionType
   radius: number
   maxRadius?: number
-  damage?: number
-  heal?: number
   expansionHold?: number
   isExpansion?: boolean
   isInstant?: boolean
   isReadyHold?: number
   color?: string
-  isSucking?: boolean
 }
 
 interface IVoidZone {
@@ -24,9 +21,6 @@ interface IVoidZone {
   radius: number
   maxRadius: number
 
-  damage: number
-  heal: number
-
   isExpansion: boolean
   expansionElapse: number
   expansionHold: number
@@ -36,11 +30,9 @@ interface IVoidZone {
   isReadyHold: number
 
   color: string
-
-  isSucking: boolean
 }
 
-export class VoidZone implements IVoidZone {
+export class VoidZoneBase implements IVoidZone {
   ctx
 
   position
@@ -71,27 +63,22 @@ export class VoidZone implements IVoidZone {
     position,
     maxRadius,
     radius,
-    damage,
     expansionHold,
     isExpansion,
     isInstant,
     isReadyHold,
-    color,
-    heal,
-    isSucking
+    color
   }: VoidZoneConstructorType) {
     this.ctx = ctx
     this.position = position
     this.maxRadius = maxRadius ?? radius
     this.radius = radius
-    this.damage = damage ?? this.damage
-    this.heal = heal ?? this.heal
+
     this.expansionHold = expansionHold ?? this.expansionHold
     this.isExpansion = isExpansion ?? this.isExpansion
     this.isInstant = isInstant ?? this.isInstant
     this.isReadyHold = isReadyHold ?? this.isReadyHold
     this.color = color ?? this.color
-    this.isSucking = isSucking ?? this.isSucking
   }
 
   territoryExpansion() {
@@ -107,37 +94,7 @@ export class VoidZone implements IVoidZone {
     })
   }
 
-  isCollisionWithTargets(target: TargetType) {
-    const isCollision = Engine.Utils.isTargetsColision({
-      positionTargetA: { position: this.position, radius: this.radius },
-      positionTargetB: { position: target.position, radius: target.radius }
-    })
-
-    if (isCollision) {
-      Draw.Circle({
-        ctx: this.ctx,
-        radius: target.radius,
-        position: target.position,
-        color: 'red',
-        fill: false
-      })
-
-      if (this.damage && target.affectWithTarget) {
-        target.affectWithTarget(this.damage)
-      }
-
-      if (this.heal && target.healWithTarget && this.radius > 0) {
-        if (this.isSucking) {
-          this.radius -= 1
-          if (this.radius < 10) {
-            this.isExists = false
-          }
-        }
-
-        target.healWithTarget(this.heal)
-      }
-    }
-  }
+  isCollisionWithTargets(target: TargetType) {}
 
   instantDraw(target: TargetType) {
     Draw.Circle({ ctx: this.ctx, radius: this.radius, position: this.position, color: this.color })
@@ -157,6 +114,7 @@ export class VoidZone implements IVoidZone {
 
       this.ctx.beginPath()
       this.ctx.strokeStyle = '#62E200'
+      this.ctx.lineWidth = 4
       this.ctx.arc(
         target.position.x,
         target.position.y,

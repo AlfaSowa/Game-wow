@@ -2,7 +2,7 @@ import { CanvasPoolCreate, CanvasPoolCreateReturn } from './types'
 
 let zIndex: number = 1
 export class CanvasPool {
-  create({ parent, width = 1, height = 1, refComponent, alpha = true }: CanvasPoolCreate): CanvasPoolCreateReturn {
+  create({ width = 1, height = 1, refComponent, alpha = true }: CanvasPoolCreate): CanvasPoolCreateReturn {
     let canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height
@@ -11,14 +11,15 @@ export class CanvasPool {
 
     zIndex++
 
-    const context = canvas.getContext('2d', { alpha }) as CanvasRenderingContext2D
+    const ctx = canvas.getContext('2d', { alpha }) as CanvasRenderingContext2D
 
     const container = refComponent || document.body
 
     container.appendChild(canvas)
+
     return {
       canvas,
-      context
+      ctx
     }
   }
 }
