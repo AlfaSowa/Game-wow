@@ -7,6 +7,7 @@ import {
   drawCircle,
   drawImage,
   drawRectangle,
+  getDistBetweenTargets,
   isMouseOnTarget,
   isOnCanavasField,
   isTargetsColision,
@@ -32,6 +33,7 @@ export const Engine = {
   },
   Utils: {
     isOnCanavasField: isOnCanavasField,
+    getDistBetweenTargets: getDistBetweenTargets,
     isTargetsColision: isTargetsColision,
     IsTargetsRectColision: IsTargetsRectColision,
     isMouseOnTarget: isMouseOnTarget,

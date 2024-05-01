@@ -21,7 +21,7 @@ export class TailsetMap {
   img = new Image()
 
   redrawMapElapsed: number = 0
-  redrawMapHold: number = 1000
+  redrawMapHold: number = 10
   redrawMapPreload: boolean = true
 
   amountWidth = 0
@@ -30,9 +30,9 @@ export class TailsetMap {
   tailSize = 0
   tailsGap = 0
 
-  simpleTiles: boolean = false
+  simpleTiles: boolean = true
 
-  isDynamic: boolean = false
+  isDynamic: boolean = true
 
   constructor({ ctx, tailSize, tailsGap }: TailsetMapConstructorType) {
     this.ctx = ctx

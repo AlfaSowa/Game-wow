@@ -16,31 +16,28 @@ export const isOnCanavasField = ({ radius, position, ctx }: IsOnCanavasFieldProp
   )
 }
 
-//--isTargetsColision--//
-type IsTargetsColisionType = {
-  positionTargetA: TargetType
-  positionTargetB: TargetType
-}
-export const isTargetsColision = ({
-  positionTargetA: targetA,
-  positionTargetB: targetB
-}: IsTargetsColisionType): boolean => {
+//--getDistBetweenTargets--//
+export const getDistBetweenTargets = (targetA: TargetType, targetB: TargetType): number => {
   let delta = {
     x: targetA.position.x - targetB.position.x,
     y: targetA.position.y - targetB.position.y
   }
 
-  return Math.sqrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2)) < targetA.radius + targetB.radius
+  return Math.sqrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2))
+}
+
+//--isTargetsColision--//
+export const isTargetsColision = (targetA: TargetType, targetB: TargetType): boolean => {
+  return getDistBetweenTargets(targetA, targetB) < targetA.radius + targetB.radius
 }
 
 //--isTargetsRectColision--//
 type TargetSizeType = { width: number; height: number }
 
-type IsTargetsRectColisionType = {
-  targetA: TargetType & TargetSizeType
+export const IsTargetsRectColision = (
+  targetA: TargetType & TargetSizeType,
   targetB: TargetType & TargetSizeType
-}
-export const IsTargetsRectColision = ({ targetA, targetB }: IsTargetsRectColisionType): boolean => {
+): boolean => {
   if (
     targetA.position.x + targetA.width >= targetB.position.x &&
     targetA.position.x <= targetB.position.x + targetB.width &&
@@ -104,6 +101,6 @@ export const setMousePosition = (bild: any, { offsetX, offsetY }: MouseEvent) =>
 }
 
 //--randomNumber--//
-export const randomNumber = (max: number, min: number): number => {
+export const randomNumber = ([max, min]: number[]): number => {
   return Math.round(Math.random() * (max - min) + min)
 }

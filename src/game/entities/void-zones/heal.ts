@@ -6,6 +6,8 @@ export type HealVoidZoneConstructorType = CoreBaseConstructorType & {
 }
 
 export class HealVoidZone extends VoidZoneBase {
+  healOnCollision: number = 1
+
   constructor({ ctx, position }: HealVoidZoneConstructorType) {
     super({
       ctx,
@@ -18,18 +20,18 @@ export class HealVoidZone extends VoidZoneBase {
   isCollisionWithTargets(target: TargetType) {
     super.isCollisionWithTargets(target)
 
-    const isCollision = Engine.Utils.isTargetsColision({
-      positionTargetA: { position: this.position, radius: this.radius },
-      positionTargetB: { position: target.position, radius: target.radius }
-    })
+    const targetA = { position: this.position, radius: this.radius }
+    const targetB = { position: target.position, radius: target.radius }
 
-    if (isCollision && target.healWithTarget && this.radius > 0) {
+    const isCollision = Engine.Utils.isTargetsColision(targetA, targetB)
+
+    if (isCollision && target.heal && this.radius > 0) {
       this.radius -= 1
       if (this.radius < 10) {
         this.isExists = false
       }
 
-      target.healWithTarget(0.1)
+      target.heal(this.healOnCollision)
     }
   }
 

@@ -1,4 +1,4 @@
-import { CoreBaseConstructorType, Engine, MouseType, TargetType } from '../../../engine'
+import { CoreBaseConstructorType, Engine, MouseType } from '../../../engine'
 import { Boss } from '../../enemies'
 import { Terraforming } from '../../entities/terraforming'
 import { HealVoidZone } from '../../entities/void-zones'
@@ -33,8 +33,8 @@ export class PlayerMagSpells extends SpellsBase {
     this.terraforming = new Terraforming({
       ctx: this.ctx,
       position: { x: this.mouse.x, y: this.mouse.y },
-      xBlocks: Engine.Utils.randomNumber(1, 12),
-      yBlocks: Engine.Utils.randomNumber(1, 12),
+      xBlocks: Engine.Utils.randomNumber([1, 12]),
+      yBlocks: Engine.Utils.randomNumber([1, 12]),
       tailSize: this.tailSize
     })
   }

@@ -1,7 +1,8 @@
 type GameComponentProps = {
-  starGame: any
-  stopGame: any
-  pauseGame: any
+  starGame: () => void
+  stopGame: () => void
+  pauseGame: () => void
+  openSkillsModal: () => void
 }
 
 const BUTTONS = [
@@ -12,23 +13,19 @@ const BUTTONS = [
   },
   {
     id: 2,
-    name: 'СТОП',
-    action: 'stop'
-  },
-  {
-    id: 3,
-    name: 'ПАУЗА',
-    action: 'pause'
+    name: 'СКИЛЫ',
+    action: 'skills'
   }
 ]
 
 type ActionsType = 'start' | 'stop' | 'pause'
 
-export const GameComponent = ({ starGame, stopGame, pauseGame }: GameComponentProps) => {
+export const GameComponent = ({ starGame, stopGame, pauseGame, openSkillsModal }: GameComponentProps) => {
   const actions = {
     start: starGame,
     stop: stopGame,
-    pause: pauseGame
+    pause: pauseGame,
+    skills: openSkillsModal
   }
 
   return (
@@ -38,11 +35,10 @@ export const GameComponent = ({ starGame, stopGame, pauseGame }: GameComponentPr
           <h1 className="text-2xl pb-4 text-center">Lorem, ipsum dolor.</h1>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem sequi incidunt nulla eius
-            odio esse maxime est quia, dolor aut quaerat aliquid quis natus error inventore iusto,
-            nobis vitae at adipisci architecto minus? Ratione id, repellat temporibus excepturi
-            minus laudantium officiis repellendus tenetur eligendi soluta animi delectus placeat ex
-            odio delenr molestiae nobis harum esse, ducimus vero.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem sequi incidunt nulla eius odio esse maxime
+            est quia, dolor aut quaerat aliquid quis natus error inventore iusto, nobis vitae at adipisci architecto
+            minus? Ratione id, repellat temporibus excepturi minus laudantium officiis repellendus tenetur eligendi
+            soluta animi delectus placeat ex odio delenr molestiae nobis harum esse, ducimus vero.
           </p>
         </div>
       </div>

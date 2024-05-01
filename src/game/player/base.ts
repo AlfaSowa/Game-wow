@@ -14,7 +14,7 @@ type PlayerBaseConstructorType = CoreBaseConstructorType & {
   health?: number
   type?: PlayerAttackType
   sprite?: Sprite
-  autoAttacksDamage?: number
+  autoAttacksDamage?: number[]
 }
 
 type DrawPlayerProps = { bounds?: number; entities: Boss[] }
@@ -47,7 +47,7 @@ export class PlayerBase {
   healthBar: Bar
 
   attacks: RangeAttack[] = []
-  autoAttacksDamage: number = 50
+  autoAttacksDamage: number[] = [20, 60]
 
   dashBar: Bar
 
@@ -80,7 +80,8 @@ export class PlayerBase {
 
     this.healthBar = new Bar({
       ctx: this.ctx,
-      color: '#58E000',
+      color: '#25D800',
+      subColor: '#188C00',
       width: 400,
       position: { x: ctx.canvas.width / 2 - 200, y: ctx.canvas.height - 42 }
     })
@@ -96,54 +97,34 @@ export class PlayerBase {
   }
 
   baseAttack() {
-    this.target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
+    const target = { position: { x: this.mouse.x, y: this.mouse.y }, radius: 100 }
 
-    let delta = {
-      x: this.target.position.x - this.position.x,
-      y: this.target.position.y - this.position.y
-    }
-    let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y)
+    let dist = Engine.Utils.getDistBetweenTargets(target, this)
 
     if (this.type === 'range') {
       const attack = new Engine.RangeAttack({
         ctx: this.ctx,
         mouse: this.mouse,
         position: this.position,
-        spread: dist * 0.04
+        spread: dist * 0.04,
+        damage: this.autoAttacksDamage
       })
 
       this.attacks.push(attack)
     }
   }
 
-  //TODO перенести в RangeAttack
   drawAttacks(entities: Boss[]) {
     for (let i = 0; i < this.attacks.length; i++) {
       this.attacks[i].draw()
 
       for (let j = 0; j < entities.length; j++) {
-        this.isCollisionWithProjectile(entities[j], this.attacks[i])
+        this.attacks[i].isCollisionWithTarget(entities[j])
       }
 
       if (this.attacks[i].finish) {
         this.attacks = this.attacks.filter((item) => !item.finish)
       }
-    }
-  }
-
-  //TODO перенести в RangeAttack
-  isCollisionWithProjectile(element: Boss, projectile: RangeAttack) {
-    const isCollision = Engine.Utils.isTargetsColision({
-      positionTargetA: { position: projectile.position, radius: projectile.radius },
-      positionTargetB: { position: element.position, radius: element.radius } as TargetType
-    })
-
-    if (isCollision && !projectile.isAffectStart) {
-      element.affectWithTakeDamage(this.autoAttacksDamage)
-
-      projectile.targetPosition = element.position
-      projectile.targetRadius = element.radius
-      projectile.isAffectStart = true
     }
   }
 
@@ -164,15 +145,11 @@ export class PlayerBase {
 
   //TODO частично перенести в Bar чтобы не передавать comparator
   drawBars() {
-    this.healthBar.draw((arg) => {
-      return this.currentHealth / (this.health / arg)
-    })
+    this.healthBar.draw(this.currentHealth, this.health)
 
-    if (this.dashDelay) {
-      this.dashBar.draw((arg) => {
-        return this.dashDelayElapsed / (this.dashDelayHold / arg)
-      }, 'inc')
-    }
+    // if (this.dashDelay) {
+    //   this.dashBar.draw(this.dashDelayElapsed, this.dashDelayHold)
+    // }
   }
 
   dash() {
@@ -191,28 +168,13 @@ export class PlayerBase {
     }
   }
 
-  //TODO подумать нат неймингом
-  affectWithCollision(entities: Boss[]) {
-    for (let j = 0; j < entities.length; j++) {
-      this.isCollisionWithTargets(entities[j])
-    }
+  damage(damage: number) {
+    this.currentHealth -= damage
   }
 
-  isCollisionWithTargets(entity: Boss) {
-    const isCollision = Engine.Utils.isTargetsColision({
-      positionTargetA: { position: this.position, radius: this.radius },
-      positionTargetB: { position: entity.position, radius: entity.radius }
-    })
-
-    if (isCollision) {
-      Draw.Circle({
-        ctx: this.ctx,
-        radius: this.radius + 20,
-        position: this.position,
-        color: 'red',
-        fill: false
-      })
-      this.currentHealth -= entity.damageOnCollision
+  heal(value: number) {
+    if (this.currentHealth <= this.health) {
+      this.currentHealth += value
     }
   }
 
@@ -241,8 +203,8 @@ export class PlayerBase {
         return {
           sWidth: img.width / 8,
           sHeight: img.height,
-          dWidth: (img.width / 8) * 1.5,
-          dHeight: img.height * 1.5
+          dWidth: img.width / 8,
+          dHeight: img.height
         }
       },
       ImageSourceComparator: (img, curFrame = 0) => {
@@ -266,6 +228,5 @@ export class PlayerBase {
     this.drawAttacks(entities)
     this.dash()
     this.drawBars()
-    this.affectWithCollision(entities)
   }
 }

@@ -9,8 +9,6 @@ const HEIGHT_HP_BAR = 5
 const GAP_HP_BAR = 10
 
 export class Additional extends EnemyBase {
-  hpBar: Bar | null = null
-
   constructor(args: CoreBaseConstructorType) {
     super({ health: 400, position: { x: 100, y: 100 }, ...args })
 
@@ -19,23 +17,6 @@ export class Additional extends EnemyBase {
 
   init({ target, player }: { target: TargetType; player: PlayerBase }) {
     super.init({ player, target })
-    this.hpBar = new Bar({
-      ctx: this.ctx,
-      height: HEIGHT_HP_BAR,
-      width: WIDTH_HP_BAR,
-      position: {
-        x: this.position.x - WIDTH_HP_BAR / 2,
-        y: this.position.y - this.radius - GAP_HP_BAR
-      }
-    })
-  }
-
-  drawBar() {
-    if (this.hpBar) {
-      this.hpBar.draw((arg) => {
-        return this.currentHealth / (this.health / arg)
-      })
-    }
   }
 
   private shape() {
@@ -50,6 +31,5 @@ export class Additional extends EnemyBase {
   draw() {
     super.draw()
     this.shape()
-    this.drawBar()
   }
 }

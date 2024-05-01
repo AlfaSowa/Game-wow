@@ -40,8 +40,8 @@ export class VoidZoneBase implements IVoidZone {
   radius
   maxRadius = 0
 
-  damage = 0
-  heal = 0
+  damageOnCollision = 0
+  healOnCollision = 0
 
   isExpansion = false
   expansionElapse = 0
@@ -57,6 +57,8 @@ export class VoidZoneBase implements IVoidZone {
   isSucking = true
 
   color: string = '#8805A8'
+
+  owner: any = null
 
   constructor({
     ctx,

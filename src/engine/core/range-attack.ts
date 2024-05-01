@@ -1,8 +1,15 @@
 import { CoreBaseConstructorType, Draw, Engine, MouseType, PositionType } from '..'
-import { CoreBase } from '../types'
+import { CoreBase, TargetType } from '../types'
 import { randomNumber } from '../utils'
 
 export const PI2: number = (2 * Math.PI) / 2
+
+type RangeAttackConstructorType = CoreBaseConstructorType & {
+  mouse: MouseType
+  position: PositionType
+  spread: number
+  damage: number[]
+}
 
 export class RangeAttack extends CoreBase {
   radius = 8
@@ -11,37 +18,32 @@ export class RangeAttack extends CoreBase {
   color = '#0dedff'
   position: PositionType = { x: 0, y: 0 }
 
-  affectRadius = randomNumber(1, 5)
+  #isAffect: boolean = false
+  affectRadius = randomNumber([1, 5])
 
   frameElapsed: number = 0
   frameHold: number = 30
 
-  isAffectStart: boolean = false
-
   targetPosition: PositionType = { x: 0, y: 0 }
   targetRadius: number = 0
 
-  constructor({
-    mouse,
-    position,
-    spread,
-    ...args
-  }: CoreBaseConstructorType & { mouse: MouseType } & { position: PositionType } & {
-    spread: number
-  }) {
+  damageValue: number[] = [0, 0]
+
+  constructor({ mouse, position, spread, damage, ...args }: RangeAttackConstructorType) {
     super({
       mouse: {
         ...mouse,
-        x: mouse.x + randomNumber(-spread, spread),
-        y: mouse.y + randomNumber(-spread, spread)
+        x: mouse.x + randomNumber([-spread, spread]),
+        y: mouse.y + randomNumber([-spread, spread])
       },
       ...args
     })
 
     this.position = { x: position.x, y: position.y }
+    this.damageValue = damage
   }
 
-  affectDraw() {
+  affect() {
     let delta = {
       x: this.targetPosition.x - this.position.x,
       y: this.targetPosition.y - this.position.y
@@ -77,6 +79,14 @@ export class RangeAttack extends CoreBase {
     })
   }
 
+  get isAffect() {
+    return this.#isAffect
+  }
+
+  set isAffect(value: boolean) {
+    this.#isAffect = value
+  }
+
   moveProjectile() {
     if (this.position.x !== this.mouse.x || this.position.y !== this.mouse.y) {
       let delta = {
@@ -103,22 +113,34 @@ export class RangeAttack extends CoreBase {
   }
 
   drawProjectile() {
-    if (!this.isAffectStart) {
-      Draw.Circle({
-        ctx: this.ctx,
-        radius: this.radius,
-        position: this.position,
-        color: this.color
-      })
-      this.moveProjectile()
+    Draw.Circle({
+      ctx: this.ctx,
+      radius: this.radius,
+      position: this.position,
+      color: this.color
+    })
+    this.moveProjectile()
+  }
+
+  isCollisionWithTarget(target: TargetType) {
+    const isCollision = Engine.Utils.isTargetsColision(target, this)
+
+    if (isCollision && !this.isAffect) {
+      if (target.damage) {
+        target.damage(Engine.Utils.randomNumber(this.damageValue))
+      }
+
+      this.targetPosition = target.position
+      this.targetRadius = target.radius
+      this.isAffect = true
     }
   }
 
   draw() {
-    this.drawProjectile()
-
-    if (this.isAffectStart) {
-      this.affectDraw()
+    if (!this.#isAffect) {
+      this.drawProjectile()
+    } else {
+      this.affect()
     }
   }
 }

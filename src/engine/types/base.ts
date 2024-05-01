@@ -18,8 +18,9 @@ export type TargetType = {
   radius: number
   width?: number
   height?: number
-  affectWithTarget?: (damage: number) => void
-  healWithTarget?: (heal: number) => void
+  damage?: (damage: number) => void
+  heal?: (heal: number) => void
 }
 
 export type MoveMovesKeys = 'KeyW' | 'KeyA' | 'KeyS' | 'KeyD'
+export type SpellsKeys = 'KeyQ' | 'KeyE'

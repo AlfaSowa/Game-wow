@@ -1,5 +1,6 @@
 import { CoreBaseConstructorType, Draw, Engine, MouseType } from '../../../engine'
 import { Sprite } from '../../../engine/sprite'
+import { SpellsKeys } from '../../../engine/types'
 import { Boss } from '../../enemies'
 import { PlayerBase } from '../base'
 import { PlayerMagSpells } from './spells'
@@ -11,7 +12,6 @@ export class PlayerMag extends PlayerBase {
   KeyQ: boolean = false
   KeyE: boolean = false
 
-  damage: number = 50
   sprite: Sprite | null = null
 
   healZoneRaius: number = 100
@@ -43,12 +43,8 @@ export class PlayerMag extends PlayerBase {
   onKeyPress(e: KeyboardEvent, value: boolean) {
     super.onKeyPress(e, value)
 
-    if (e.code === 'KeyQ') {
-      this.KeyQ = value
-    }
-
-    if (e.code === 'KeyE') {
-      this.KeyE = value
+    if (['KeyQ', 'KeyE'].includes(e.code)) {
+      this[e.code as SpellsKeys] = value
     }
   }
 
@@ -72,45 +68,6 @@ export class PlayerMag extends PlayerBase {
         color: 'red',
         fill: false
       })
-    }
-  }
-
-  affectWithTarget(damage: number) {
-    this.currentHealth -= damage
-  }
-
-  healWithTarget(heal: number) {
-    if (this.currentHealth <= this.health) {
-      this.currentHealth += heal
-    }
-  }
-
-  isCollisionWithShape(target: any) {
-    const isCollision = Engine.Utils.IsTargetsRectColision({
-      targetA: { position: { x: target.x, y: target.y }, radius: 100, width: target.size, height: target.size },
-      targetB: {
-        position: { x: this.position.x - this.rectCollisionSize / 2, y: this.position.y - this.rectCollisionSize / 2 },
-        radius: this.radius,
-        width: this.rectCollisionSize,
-        height: this.rectCollisionSize
-      }
-    })
-
-    if (isCollision) {
-      if (this.position.x < target.x) {
-        this.position.x = this.position.x - this.vel
-      }
-
-      if (this.position.x > target.x + target.size) {
-        this.position.x = this.position.x + this.vel
-      }
-      if (this.position.y < target.y) {
-        this.position.y = this.position.y - this.vel
-      }
-
-      if (this.position.y > target.y + target.size) {
-        this.position.y = this.position.y + this.vel
-      }
     }
   }
 

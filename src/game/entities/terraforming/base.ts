@@ -44,23 +44,23 @@ export class Terraforming {
   }
 
   isCollisionWithTargets(target: TargetType & { vel: number }) {
-    const isCollision = Engine.Utils.IsTargetsRectColision({
-      targetA: {
-        position: {
-          x: this.position.x - this.width / 2,
-          y: this.position.y - this.height / 2
-        },
-        radius: this.radius,
-        width: this.width,
-        height: this.height
+    const targetA = {
+      position: {
+        x: this.position.x - this.width / 2,
+        y: this.position.y - this.height / 2
       },
-      targetB: {
-        position: { x: target.position.x - (target.width || 0) / 2, y: target.position.y - (target.height || 0) / 2 },
-        radius: target.radius,
-        width: target.width || 0,
-        height: target.height || 0
-      }
-    })
+      radius: this.radius,
+      width: this.width,
+      height: this.height
+    }
+    const targetB = {
+      position: { x: target.position.x - (target.width || 0) / 2, y: target.position.y - (target.height || 0) / 2 },
+      radius: target.radius,
+      width: target.width || 0,
+      height: target.height || 0
+    }
+
+    const isCollision = Engine.Utils.IsTargetsRectColision(targetA, targetB)
 
     if (isCollision) {
       if (target.position.x < this.position.x - this.width / 2) {

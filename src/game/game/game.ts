@@ -56,10 +56,10 @@ export class GameCustom implements IGameCustom {
     this.player = new PlayerMag({ ctx: this.ctx, mouse: this.mouse, tailSize: TAIL_SIZE })
     this.player.init()
 
-    // this.boss = new Boss({ ctx: this.ctx })
-    // this.boss.init({ target: { position: this.player.position, radius: 100 }, player: this.player })
+    this.boss = new Boss({ ctx: this.ctx })
+    this.boss.init({ target: { position: this.player.position, radius: 100 }, player: this.player })
 
-    // this.entities.push(this.boss)
+    this.entities.push(this.boss)
 
     this.ctx.canvas.addEventListener('mousemove', (e) => Engine.Utils.setMousePosition(this, e))
   }
@@ -81,9 +81,13 @@ export class GameCustom implements IGameCustom {
   }
 
   draw() {
-    // if (this.boss) {
-    //   this.boss.draw()
+    // if (this.tailset) {
+    //   this.tailset.draw()
     // }
+
+    if (this.boss) {
+      this.boss.draw()
+    }
     if (this.player) {
       this.player.draw({ entities: this.entities, bounds: TAILS_GAP })
     }

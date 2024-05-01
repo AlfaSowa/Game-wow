@@ -12,10 +12,14 @@ export class Boss extends EnemyBase {
 
   fireVoidZones: FireVoidZone[] = []
   voidZoneElapse: number = 0
-  voidZoneHold: number = 1000
+  voidZoneHold: number = 900
+
+  isSucking: boolean = false
+  suckingVoidesElapse: number = 0
+  suckingVoidesHold: number = 3000
 
   constructor(args: CoreBaseConstructorType) {
-    super({ health: 500, position: { x: args.ctx.canvas.width / 2, y: 100 }, ...args })
+    super({ health: 2000, position: { x: args.ctx.canvas.width / 2, y: 200 }, ...args })
     this.healthBar = new Bar({ ctx: this.ctx })
   }
 
@@ -46,12 +50,19 @@ export class Boss extends EnemyBase {
     })
   }
 
+  getSuckVoides() {
+    Engine.Helpers.delayToCallback('suckingVoidesElapse', 'suckingVoidesHold', this, () => {
+      this.isSucking = true
+    })
+  }
+
   createFireVoidZones() {
     Engine.Helpers.delayToCallback('voidZoneElapse', 'voidZoneHold', this, () => {
       this.fireVoidZones.push(
         new FireVoidZone({
           ctx: this.ctx,
-          position: { x: this.target.position.x, y: this.target.position.y }
+          position: { x: this.target.position.x, y: this.target.position.y },
+          owner: this
         })
       )
     })
@@ -59,22 +70,28 @@ export class Boss extends EnemyBase {
 
   //TODO частично перенести в Bar чтобы не передавать comparator
   drawHealthBar() {
-    this.healthBar.draw((arg) => {
-      return this.currentHealth / (this.health / arg)
-    })
+    this.healthBar.draw(this.currentHealth, this.health)
   }
 
   //TODO подумать как не передавать player
   drawFireVoidZones() {
-    // if (this.player) {
-    //   for (let i = 0; i < this.fireVoidZones.length; i++) {
-    //     this.fireVoidZones[i].draw({
-    //       position: this.player.position,
-    //       radius: this.player.radius,
-    //       affectWithTarget: this.player.affectWithTarget.bind(this.player)
-    //     })
-    //   }
-    // }
+    if (this.player) {
+      for (let i = 0; i < this.fireVoidZones.length; i++) {
+        if (this.isSucking && !this.fireVoidZones[i].isMoveToOwner) {
+          this.fireVoidZones[i].isMoveToOwner = true
+        }
+
+        this.fireVoidZones[i].draw({
+          position: this.player.position,
+          radius: this.player.radius,
+          damage: this.player.damage.bind(this.player)
+        })
+
+        if (!this.fireVoidZones[i].isExists) {
+          this.fireVoidZones = this.fireVoidZones.filter((item) => item.isExists)
+        }
+      }
+    }
   }
 
   private shape() {
@@ -83,9 +100,9 @@ export class Boss extends EnemyBase {
     }
   }
 
-  //TODO подумать нат неймингом
-  affectWithTakeDamage(damage: number) {
-    this.currentHealth -= damage
+  damage(value: number) {
+    this.currentHealth -= value
+
     Draw.Circle({
       ctx: this.ctx,
       radius: this.radius + 20,
@@ -95,10 +112,27 @@ export class Boss extends EnemyBase {
     })
   }
 
+  isCollisionWithTargets() {
+    if (this.player) {
+      const isCollision = Engine.Utils.isTargetsColision(this.player, this)
+
+      if (isCollision && this.player.damage) {
+        this.player.damage(this.damageOnCollision)
+      }
+    }
+  }
+
   draw() {
     super.draw()
-    this.createFireVoidZones()
-    this.drawFireVoidZones()
+
+    // if (!this.isSucking) {
+    //   this.getSuckVoides()
+    //   this.createFireVoidZones()
+    // }
+
+    // this.drawFireVoidZones()
+
+    this.isCollisionWithTargets()
     this.shape()
     this.drawHealthBar()
   }
